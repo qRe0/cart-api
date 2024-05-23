@@ -82,9 +82,9 @@ func (r *CartRepository) GetLastID() (int, error) {
 
 func (r *CartRepository) GetLastItemID() (int, error) {
 	var id int
-	err := r.db.QueryRow("SELECT COUNT(*) FROM items").Scan(&id)
+	err := r.db.QueryRow("SELECT MAX(id) FROM items").Scan(&id)
 	if err != nil {
-		return 0, errors.New("error getting last item id from database")
+		return 0, errors.New("error getting last item id from database. database is empty. currentID = 0")
 	}
 
 	return id, nil

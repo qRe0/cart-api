@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 	"strconv"
 	"sync"
@@ -42,8 +43,8 @@ func (h *HandleItem) AddItemToCart(w http.ResponseWriter, r *http.Request) {
 
 	itemID, err := h.service.GetLastItemID()
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+		log.Println(err)
+		w.WriteHeader(http.StatusContinue)
 	}
 
 	item.CartID = cartID
@@ -64,7 +65,7 @@ func (h *HandleItem) AddItemToCart(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusCreated)
+	w.WriteHeader(http.StatusOK)
 	err = json.NewEncoder(w).Encode(item)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
@@ -111,5 +112,4 @@ func (h *HandleItem) RemoveItemFromCart(w http.ResponseWriter, r *http.Request) 
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	w.WriteHeader(http.StatusOK)
 }
