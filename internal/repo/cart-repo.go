@@ -48,8 +48,17 @@ func (r *CartRepository) AddItemToCart(cart models.Cart, item models.CartItem) e
 }
 
 func (r *CartRepository) RemoveItemFromCart(cart models.Cart, item models.CartItem) error {
-	var itemCount int
-	err := r.db.QueryRow("SELECT COUNT(*) FROM items WHERE id = $1 AND cart_id = $2", item.ID, cart.ID).Scan(&itemCount)
+	var itemCount, cartCount int
+	err := r.db.QueryRow("SELECT COUNT(*) FROM carts WHERE id = $1", cart.ID).Scan(&cartCount)
+	if err != nil {
+		return errors.New("error getting items count from database")
+	}
+
+	if cartCount == 0 {
+		return errors.New("error. cart not found in database")
+	}
+
+	err = r.db.QueryRow("SELECT COUNT(*) FROM items WHERE id = $1 AND cart_id = $2", item.ID, cart.ID).Scan(&itemCount)
 	if err != nil {
 		return errors.New("error getting items count from database")
 	}
@@ -66,7 +75,31 @@ func (r *CartRepository) RemoveItemFromCart(cart models.Cart, item models.CartIt
 	return nil
 }
 
-func (r *CartRepository) GetCart(cart models.Cart, item models.CartItem) error {
+func (r *CartRepository) GetCart(cart *models.Cart, item models.CartItem) error {
+	var cartCount int
+	err := r.db.QueryRow("SELECT COUNT(*) FROM carts WHERE id = $1", cart.ID).Scan(&cartCount)
+	if err != nil {
+		return errors.New("error getting items count from database")
+	}
+
+	if cartCount == 0 {
+		return errors.New("error. cart not found in database")
+	}
+
+	rows, err := r.db.Query("SELECT * FROM items WHERE cart_id = $1", cart.ID)
+	if err != nil {
+		return errors.New("error getting items from database")
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		err = rows.Scan(&item.ID, &item.CartID, &item.Product, &item.Quantity)
+		if err != nil {
+			return errors.New("error getting items from database")
+		}
+		cart.Items = append(cart.Items, item)
+	}
+
 	return nil
 }
 

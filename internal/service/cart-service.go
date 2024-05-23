@@ -27,7 +27,7 @@ func (c *CartService) RemoveItemFromCart(cart models.Cart, item models.CartItem)
 	return c.repo.RemoveItemFromCart(cart, item)
 }
 
-func (c *CartService) GetCart(cart models.Cart, item models.CartItem) error {
+func (c *CartService) GetCart(cart *models.Cart, item models.CartItem) error {
 	return c.repo.GetCart(cart, item)
 }
 
