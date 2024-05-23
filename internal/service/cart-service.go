@@ -32,7 +32,7 @@ func (c *CartService) GetCart(cart *models.Cart, item models.CartItem) error {
 }
 
 func (c *CartService) GetLastCartId() (int, error) {
-	return c.repo.GetLastID()
+	return c.repo.GetLastCartID()
 }
 
 func (c *CartService) GetLastItemID() (int, error) {

@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"sync"
 
+	myErrors "github.com/qRe0/innowise-cart-api/internal/errors"
 	"github.com/qRe0/innowise-cart-api/internal/models"
 	s "github.com/qRe0/innowise-cart-api/internal/service"
 )
@@ -55,7 +56,7 @@ func (h *HandleCart) GetCart(w http.ResponseWriter, r *http.Request) {
 	cartIDStr := r.URL.Path[len("/carts/"):]
 	cartID, err := strconv.Atoi(cartIDStr)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		http.Error(w, myErrors.ErrWrongCartID.Error(), http.StatusBadRequest)
 		return
 	}
 
@@ -74,7 +75,7 @@ func (h *HandleCart) GetCart(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	err = json.NewEncoder(w).Encode(cart)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		http.Error(w, myErrors.ErrEncodingJSON.Error(), http.StatusBadRequest)
 		return
 	}
 }

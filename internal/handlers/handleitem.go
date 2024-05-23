@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"sync"
 
+	myErrors "github.com/qRe0/innowise-cart-api/internal/errors"
 	"github.com/qRe0/innowise-cart-api/internal/models"
 	s "github.com/qRe0/innowise-cart-api/internal/service"
 )
@@ -26,14 +27,14 @@ func (h *HandleItem) AddItemToCart(w http.ResponseWriter, r *http.Request) {
 	cartIDStr = cartIDStr[:len(cartIDStr)-len("/items")]
 	cartID, err := strconv.Atoi(cartIDStr)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		http.Error(w, myErrors.ErrWrongCartID.Error(), http.StatusBadRequest)
 		return
 	}
 
 	var item models.CartItem
 	err = json.NewDecoder(r.Body).Decode(&item)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		http.Error(w, myErrors.ErrDecodingReqBody.Error(), http.StatusBadRequest)
 		return
 	}
 
@@ -43,7 +44,7 @@ func (h *HandleItem) AddItemToCart(w http.ResponseWriter, r *http.Request) {
 
 	itemID, err := h.service.GetLastItemID()
 	if err != nil {
-		log.Println(err)
+		log.Println(err.Error())
 		w.WriteHeader(http.StatusContinue)
 	}
 
@@ -68,7 +69,7 @@ func (h *HandleItem) AddItemToCart(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	err = json.NewEncoder(w).Encode(item)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		http.Error(w, myErrors.ErrEncodingJSON.Error(), http.StatusBadRequest)
 		return
 	}
 }
@@ -80,12 +81,12 @@ func (h *HandleItem) RemoveItemFromCart(w http.ResponseWriter, r *http.Request) 
 
 	cartID, err := strconv.Atoi(cartIDStr)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		http.Error(w, myErrors.ErrWrongCartID.Error(), http.StatusBadRequest)
 		return
 	}
 	itemID, err := strconv.Atoi(itemIDStr)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		http.Error(w, myErrors.ErrWrongItemID.Error(), http.StatusBadRequest)
 		return
 	}
 
@@ -109,7 +110,7 @@ func (h *HandleItem) RemoveItemFromCart(w http.ResponseWriter, r *http.Request) 
 	w.Header().Set("Content-Type", "application/json")
 	_, err = w.Write([]byte("{}"))
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		http.Error(w, myErrors.ErrEncodingJSON.Error(), http.StatusBadRequest)
 		return
 	}
 }
