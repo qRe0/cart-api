@@ -9,12 +9,12 @@ import (
 )
 
 type CartService struct {
-	repo *r.CartRepository
+	repo r.ICartRepository
 }
 
-func NewCartService() *CartService {
+func NewCartService(repo r.ICartRepository) *CartService {
 	return &CartService{
-		repo: r.NewCartRepository(),
+		repo: repo,
 	}
 }
 
@@ -56,7 +56,11 @@ func (c *CartService) RemoveItemFromCart(cartIDStr, itemIDStr string) error {
 	return c.repo.RemoveItemFromCart(cartID, itemID)
 }
 
-func (c *CartService) GetCart(cartID int) (*models.Cart, error) {
+func (c *CartService) GetCart(cartIDStr string) (*models.Cart, error) {
+	cartID, err := strconv.Atoi(cartIDStr)
+	if err != nil {
+		return nil, myErrors.ErrWrongCartID
+	}
 	if cartID <= 0 {
 		return nil, myErrors.ErrWrongCartID
 	}

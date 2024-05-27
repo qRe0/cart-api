@@ -5,21 +5,37 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/jmoiron/sqlx"
+	myErrors "github.com/qRe0/innowise-cart-api/internal/errors"
 	"github.com/qRe0/innowise-cart-api/internal/handlers"
+	repository "github.com/qRe0/innowise-cart-api/internal/repo"
+	"github.com/qRe0/innowise-cart-api/internal/service"
 )
 
 func Run() {
-	h := handlers.NewHandler()
+	db := repository.Init()
 
-	http.HandleFunc("/carts", h.HandleCart.CreateCart)
+	defer func(db *sqlx.DB) {
+		err := db.Close()
+		if err != nil {
+			e := myErrors.ErrClosingDB
+			panic(e)
+		}
+	}(db)
+
+	cartRepo := repository.NewCartRepository(db)
+	cartService := service.NewCartService(cartRepo)
+	handler := handlers.NewHandler(cartService)
+
+	http.HandleFunc("/carts", handler.HandleCart.CreateCart)
 	http.HandleFunc("/carts/", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodPost:
-			h.HandleItem.AddItemToCart(w, r)
+			handler.HandleItem.AddItemToCart(w, r)
 		case http.MethodGet:
-			h.HandleCart.GetCart(w, r)
+			handler.HandleCart.GetCart(w, r)
 		case http.MethodDelete:
-			h.HandleItem.RemoveItemFromCart(w, r)
+			handler.HandleItem.RemoveItemFromCart(w, r)
 		}
 	})
 

@@ -12,9 +12,9 @@ type CartRepository struct {
 	db *sqlx.DB
 }
 
-func NewCartRepository() *CartRepository {
+func NewCartRepository(db *sqlx.DB) *CartRepository {
 	return &CartRepository{
-		db: Init(),
+		db: db,
 	}
 }
 
@@ -102,7 +102,7 @@ func (r *CartRepository) GetCart(cartID int) (*models.Cart, error) {
 	var cartCount int
 	_ = r.db.QueryRow("SELECT COUNT(*) FROM carts WHERE id = $1", cartID).Scan(&cartCount)
 	if cartCount == 0 {
-		return nil, myErrors.ErrGettingCartsCount
+		return nil, myErrors.ErrCartNotFound
 	}
 
 	rows, err := r.db.Query("SELECT * FROM items WHERE cart_id = $1", cartID)

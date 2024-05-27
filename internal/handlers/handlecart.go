@@ -3,19 +3,18 @@ package handlers
 import (
 	"encoding/json"
 	"net/http"
-	"strconv"
 
 	myErrors "github.com/qRe0/innowise-cart-api/internal/errors"
 	s "github.com/qRe0/innowise-cart-api/internal/service"
 )
 
 type HandleCart struct {
-	service *s.CartService
+	service s.ICartService
 }
 
-func NewHandleCart() *HandleCart {
+func NewHandleCart(cs s.ICartService) *HandleCart {
 	return &HandleCart{
-		service: s.NewCartService(),
+		service: cs,
 	}
 }
 
@@ -37,13 +36,8 @@ func (h *HandleCart) CreateCart(w http.ResponseWriter, r *http.Request) {
 
 func (h *HandleCart) GetCart(w http.ResponseWriter, r *http.Request) {
 	cartIDStr := r.URL.Path[len("/carts/"):]
-	cartID, err := strconv.Atoi(cartIDStr)
-	if err != nil {
-		http.Error(w, myErrors.ErrWrongCartID.Error(), http.StatusBadRequest)
-		return
-	}
 
-	cart, err := h.service.GetCart(cartID)
+	cart, err := h.service.GetCart(cartIDStr)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return

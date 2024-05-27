@@ -11,12 +11,12 @@ import (
 )
 
 type HandleItem struct {
-	service *s.CartService
+	service s.ICartService
 }
 
-func NewHandleItem() *HandleItem {
+func NewHandleItem(cs s.ICartService) *HandleItem {
 	return &HandleItem{
-		service: s.NewCartService(),
+		service: cs,
 	}
 }
 
