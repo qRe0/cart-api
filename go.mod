@@ -1,6 +1,6 @@
 module github.com/qRe0/innowise-cart-api
 
-go 1.21.9
+go 1.17
 
 require (
 	github.com/jmoiron/sqlx v1.4.0

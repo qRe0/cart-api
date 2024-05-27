@@ -2,10 +2,10 @@ CREATE TABLE "carts"("id" SERIAL NOT NULL);
 ALTER TABLE
     "carts" ADD PRIMARY KEY("id");
 CREATE TABLE "items"(
-    "id" SERIAL NOT NULL,
-    "cart_id" INTEGER NOT NULL,
-    "product" TEXT NOT NULL,
-    "quantity" INTEGER NOT NULL
+                        "id" SERIAL NOT NULL,
+                        "cart_id" INTEGER NOT NULL,
+                        "product" TEXT NOT NULL,
+                        "quantity" INTEGER NOT NULL
 );
 ALTER TABLE
     "items" ADD PRIMARY KEY("id");

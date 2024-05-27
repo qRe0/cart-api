@@ -1,0 +1,22 @@
+version: '3'
+
+services:
+  database:
+    image: postgres:latest
+    container_name: cart_api_database
+    restart: "no"
+    environment:
+      POSTGRES_USER: pgadmin
+      POSTGRES_PASSWORD: 24112004
+      POSTGRES_DB: cart_api
+    ports:
+      - "5432:5432"
+
+  web:
+    build: .
+    container_name: cart_api_web
+    restart: "no"
+    ports:
+      - "3000:3000"
+    depends_on:
+      - database

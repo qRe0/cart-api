@@ -1,6 +1,8 @@
 package repository
 
 import (
+	"fmt"
+
 	"github.com/jmoiron/sqlx"
 	myErrors "github.com/qRe0/innowise-cart-api/internal/errors"
 	"github.com/qRe0/innowise-cart-api/internal/models"
@@ -19,11 +21,18 @@ func NewCartRepository(db *sqlx.DB) *CartRepository {
 }
 
 func Init() *sqlx.DB {
-	db, err := sqlx.Connect("postgres", "user=pgadmin password=24112004 dbname=cart_api sslmode=disable")
+	db, err := sqlx.Open("postgres", "user=pgadmin password=24112004 dbname=cart_api sslmode=disable")
 	if err != nil {
 		e := myErrors.ErrConnectingToDB
 		panic(e)
 	}
+
+	err = db.Ping()
+	if err != nil {
+		return nil
+	}
+
+	fmt.Println("Connected to DB successfully!")
 
 	return db
 }
