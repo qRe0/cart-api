@@ -2,10 +2,8 @@ package handlers
 
 import (
 	"encoding/json"
-	"log"
 	"net/http"
-	"strconv"
-	"sync"
+	"regexp"
 
 	myErrors "github.com/qRe0/innowise-cart-api/internal/errors"
 	"github.com/qRe0/innowise-cart-api/internal/models"
@@ -25,41 +23,15 @@ func NewHandleItem() *HandleItem {
 func (h *HandleItem) AddItemToCart(w http.ResponseWriter, r *http.Request) {
 	cartIDStr := r.URL.Path[len("/carts/"):]
 	cartIDStr = cartIDStr[:len(cartIDStr)-len("/items")]
-	cartID, err := strconv.Atoi(cartIDStr)
-	if err != nil {
-		http.Error(w, myErrors.ErrWrongCartID.Error(), http.StatusBadRequest)
-		return
-	}
 
-	var item models.CartItem
-	err = json.NewDecoder(r.Body).Decode(&item)
+	var parsedItem models.CartItem
+	err := json.NewDecoder(r.Body).Decode(&parsedItem)
 	if err != nil {
 		http.Error(w, myErrors.ErrDecodingReqBody.Error(), http.StatusBadRequest)
 		return
 	}
 
-	var mu sync.Mutex
-	mu.Lock()
-	defer mu.Unlock()
-
-	itemID, err := h.service.GetLastItemID()
-	if err != nil {
-		log.Println(err.Error())
-		w.WriteHeader(http.StatusContinue)
-	}
-
-	item.CartID = cartID
-	itemID++
-	item.ID = &itemID
-
-	cart := models.Cart{
-		Entity: models.Entity{
-			ID: &cartID,
-		},
-		Items: []models.CartItem{item},
-	}
-
-	err = h.service.AddItemToCart(cart, item)
+	item, err := h.service.AddItemToCart(cartIDStr, parsedItem)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
@@ -75,33 +47,19 @@ func (h *HandleItem) AddItemToCart(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *HandleItem) RemoveItemFromCart(w http.ResponseWriter, r *http.Request) {
-	path := r.URL.Path[len("/carts/"):]
-	cartIDStr := path[:len(path)-len("/items/")-1]
-	itemIDStr := path[len(cartIDStr)+len("/items/"):]
+	path := r.URL.Path
+	re := regexp.MustCompile(`/carts/(\d+)/items/(\d+)`)
+	matches := re.FindStringSubmatch(path)
 
-	cartID, err := strconv.Atoi(cartIDStr)
-	if err != nil {
-		http.Error(w, myErrors.ErrWrongCartID.Error(), http.StatusBadRequest)
-		return
-	}
-	itemID, err := strconv.Atoi(itemIDStr)
-	if err != nil {
-		http.Error(w, myErrors.ErrWrongItemID.Error(), http.StatusBadRequest)
-		return
+	var cartIDStr, itemIDStr string
+	if len(matches) == 3 {
+		cartIDStr = matches[1]
+		itemIDStr = matches[2]
+	} else {
+		http.Error(w, myErrors.ErrInvalidURLFormat.Error(), http.StatusBadRequest)
 	}
 
-	var item models.CartItem
-	item.ID = &itemID
-	item.CartID = cartID
-
-	cart := models.Cart{
-		Entity: models.Entity{
-			ID: &cartID,
-		},
-		Items: []models.CartItem{item},
-	}
-
-	err = h.service.RemoveItemFromCart(cart, item)
+	err := h.service.RemoveItemFromCart(cartIDStr, itemIDStr)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return

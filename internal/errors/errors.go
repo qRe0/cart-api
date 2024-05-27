@@ -19,4 +19,7 @@ var (
 	ErrItemNotFound       = errors.New("error. item not found in database")
 	ErrRemoveItemFromCart = errors.New("error removing item from cart")
 	ErrGettingCartsCount  = errors.New("error getting last cart id")
+	ErrEmptyProductName   = errors.New("error. empty product name")
+	ErrWrongItemQuantity  = errors.New("error. wrong item quantity")
+	ErrInvalidURLFormat   = errors.New("error. invalid URL format")
 )

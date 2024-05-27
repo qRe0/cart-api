@@ -19,7 +19,7 @@ func NewCartRepository() *CartRepository {
 }
 
 func Init() *sqlx.DB {
-	db, err := sqlx.Connect("postgres", "user=qre password=2411 dbname=cart_api sslmode=disable")
+	db, err := sqlx.Connect("postgres", "user=pgadmin password=24112004 dbname=cart_api sslmode=disable")
 	if err != nil {
 		e := myErrors.ErrConnectingToDB
 		panic(e)
@@ -28,37 +28,69 @@ func Init() *sqlx.DB {
 	return db
 }
 
-func (r *CartRepository) CreateCart(cart models.Cart) error {
-	_, err := r.db.Exec("INSERT INTO carts (id) VALUES ($1)", cart.ID)
+func (r *CartRepository) CreateCart() (*models.Cart, error) {
+	_, err := r.db.Exec("INSERT INTO carts DEFAULT VALUES ")
 	if err != nil {
-		return myErrors.ErrCreatingCart
+		return nil, myErrors.ErrCreatingCart
 	}
 
-	return nil
-}
-
-func (r *CartRepository) AddItemToCart(cart models.Cart, item models.CartItem) error {
-	_, err := r.db.Exec("INSERT INTO items (id, cart_id, product, quantity) VALUES ($1, $2, $3, $4)", item.ID, cart.ID, item.Product, item.Quantity)
+	var id int
+	err = r.db.QueryRow("SELECT MAX(id) from carts").Scan(&id)
 	if err != nil {
-		return myErrors.ErrAddItemToCart
+		return nil, myErrors.ErrWrongCartID
 	}
 
-	return nil
+	cart := models.Cart{
+		Entity: models.Entity{
+			ID: &id,
+		},
+		Items: []models.CartItem{},
+	}
+
+	return &cart, nil
 }
 
-func (r *CartRepository) RemoveItemFromCart(cart models.Cart, item models.CartItem) error {
+func (r *CartRepository) AddItemToCart(cartID int, item models.CartItem) (*models.CartItem, error) {
+	var cartCount int
+	_ = r.db.QueryRow("SELECT COUNT(id) FROM carts WHERE id = $1", cartID).Scan(&cartCount)
+	if cartCount == 0 {
+		return nil, myErrors.ErrCartNotFound
+	}
+
+	_, err := r.db.Exec("INSERT INTO items (cart_id, product, quantity) VALUES ($1, $2, $3)", cartID, item.Product, item.Quantity)
+	if err != nil {
+		return nil, myErrors.ErrAddItemToCart
+	}
+
+	id, err := r.GetLastItemID()
+	if err != nil {
+		return nil, myErrors.ErrGettingLastItemID
+	}
+	item = models.CartItem{
+		Entity: models.Entity{
+			ID: &id,
+		},
+		CartID:   cartID,
+		Product:  item.Product,
+		Quantity: item.Quantity,
+	}
+
+	return &item, nil
+}
+
+func (r *CartRepository) RemoveItemFromCart(cartID, itemID int) error {
 	var itemCount, cartCount int
-	_ = r.db.QueryRow("SELECT COUNT(id) FROM carts WHERE id = $1", cart.ID).Scan(&cartCount)
+	_ = r.db.QueryRow("SELECT COUNT(id) FROM carts WHERE id = $1", cartID).Scan(&cartCount)
 	if cartCount == 0 {
 		return myErrors.ErrCartNotFound
 	}
 
-	_ = r.db.QueryRow("SELECT COUNT(id) FROM items WHERE id = $1 AND cart_id = $2", item.ID, cart.ID).Scan(&itemCount)
+	_ = r.db.QueryRow("SELECT COUNT(id) FROM items WHERE id = $1 AND cart_id = $2", itemID, cartID).Scan(&itemCount)
 	if itemCount == 0 {
 		return myErrors.ErrItemNotFound
 	}
 
-	_, err := r.db.Exec("DELETE FROM items WHERE id = $1 AND cart_id = $2", item.ID, cart.ID)
+	_, err := r.db.Exec("DELETE FROM items WHERE id = $1 AND cart_id = $2", itemID, cartID)
 	if err != nil {
 		return myErrors.ErrRemoveItemFromCart
 	}
@@ -66,42 +98,31 @@ func (r *CartRepository) RemoveItemFromCart(cart models.Cart, item models.CartIt
 	return nil
 }
 
-func (r *CartRepository) GetCart(cart *models.Cart, item models.CartItem) error {
+func (r *CartRepository) GetCart(cartID int) (*models.Cart, error) {
 	var cartCount int
-	err := r.db.QueryRow("SELECT COUNT(*) FROM carts WHERE id = $1", cart.ID).Scan(&cartCount)
-	if err != nil {
-		return myErrors.ErrGettingItemsCount
-	}
-
+	_ = r.db.QueryRow("SELECT COUNT(*) FROM carts WHERE id = $1", cartID).Scan(&cartCount)
 	if cartCount == 0 {
-		return myErrors.ErrCartNotFound
+		return nil, myErrors.ErrGettingCartsCount
 	}
 
-	rows, err := r.db.Query("SELECT * FROM items WHERE cart_id = $1", cart.ID)
+	rows, err := r.db.Query("SELECT * FROM items WHERE cart_id = $1", cartID)
 	if err != nil {
-		return myErrors.ErrGetItems
+		return nil, myErrors.ErrGetItems
 	}
 	defer rows.Close()
 
+	item := models.CartItem{}
+	cart := models.Cart{}
+	cart.ID = &cartID
 	for rows.Next() {
 		err = rows.Scan(&item.ID, &item.CartID, &item.Product, &item.Quantity)
 		if err != nil {
-			return myErrors.ErrRowsScan
+			return nil, myErrors.ErrRowsScan
 		}
 		cart.Items = append(cart.Items, item)
 	}
 
-	return nil
-}
-
-func (r *CartRepository) GetLastCartID() (int, error) {
-	var id int
-	err := r.db.QueryRow("SELECT COUNT(*) FROM carts").Scan(&id)
-	if err != nil {
-		return 0, myErrors.ErrGettingLastCartID
-	}
-
-	return id, nil
+	return &cart, nil
 }
 
 func (r *CartRepository) GetLastItemID() (int, error) {

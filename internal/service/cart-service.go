@@ -1,6 +1,9 @@
 package service
 
 import (
+	"strconv"
+
+	myErrors "github.com/qRe0/innowise-cart-api/internal/errors"
 	"github.com/qRe0/innowise-cart-api/internal/models"
 	r "github.com/qRe0/innowise-cart-api/internal/repo"
 )
@@ -15,26 +18,48 @@ func NewCartService() *CartService {
 	}
 }
 
-func (c *CartService) CreateCart(cart models.Cart) error {
-	return c.repo.CreateCart(cart)
+func (c *CartService) CreateCart() (*models.Cart, error) {
+	return c.repo.CreateCart()
 }
 
-func (c *CartService) AddItemToCart(cart models.Cart, item models.CartItem) error {
-	return c.repo.AddItemToCart(cart, item)
+func (c *CartService) AddItemToCart(cartIDStr string, item models.CartItem) (*models.CartItem, error) {
+	cartID, err := strconv.Atoi(cartIDStr)
+	if err != nil {
+		return nil, myErrors.ErrWrongCartID
+	} else if cartID <= 0 {
+		return nil, myErrors.ErrWrongCartID
+	} else if item.Product == "" {
+		return nil, myErrors.ErrEmptyProductName
+	} else if item.Quantity <= 0 {
+		return nil, myErrors.ErrWrongItemQuantity
+	}
+
+	return c.repo.AddItemToCart(cartID, item)
 }
 
-func (c *CartService) RemoveItemFromCart(cart models.Cart, item models.CartItem) error {
-	return c.repo.RemoveItemFromCart(cart, item)
+func (c *CartService) RemoveItemFromCart(cartIDStr, itemIDStr string) error {
+	cartID, err := strconv.Atoi(cartIDStr)
+	if err != nil {
+		return myErrors.ErrWrongCartID
+	}
+	itemID, err := strconv.Atoi(itemIDStr)
+	if err != nil {
+		return myErrors.ErrWrongItemID
+	}
+
+	if cartID <= 0 {
+		return myErrors.ErrWrongCartID
+	} else if itemID <= 0 {
+		return myErrors.ErrWrongItemID
+	}
+
+	return c.repo.RemoveItemFromCart(cartID, itemID)
 }
 
-func (c *CartService) GetCart(cart *models.Cart, item models.CartItem) error {
-	return c.repo.GetCart(cart, item)
-}
+func (c *CartService) GetCart(cartID int) (*models.Cart, error) {
+	if cartID <= 0 {
+		return nil, myErrors.ErrWrongCartID
+	}
 
-func (c *CartService) GetLastCartId() (int, error) {
-	return c.repo.GetLastCartID()
-}
-
-func (c *CartService) GetLastItemID() (int, error) {
-	return c.repo.GetLastItemID()
+	return c.repo.GetCart(cartID)
 }

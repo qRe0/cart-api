@@ -8,9 +8,9 @@ import (
 	"github.com/qRe0/innowise-cart-api/internal/handlers"
 )
 
-var h = handlers.NewHandler()
-
 func Run() {
+	h := handlers.NewHandler()
+
 	http.HandleFunc("/carts", h.HandleCart.CreateCart)
 	http.HandleFunc("/carts/", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {

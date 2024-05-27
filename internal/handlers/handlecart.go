@@ -4,10 +4,8 @@ import (
 	"encoding/json"
 	"net/http"
 	"strconv"
-	"sync"
 
 	myErrors "github.com/qRe0/innowise-cart-api/internal/errors"
-	"github.com/qRe0/innowise-cart-api/internal/models"
 	s "github.com/qRe0/innowise-cart-api/internal/service"
 )
 
@@ -22,22 +20,7 @@ func NewHandleCart() *HandleCart {
 }
 
 func (h *HandleCart) CreateCart(w http.ResponseWriter, r *http.Request) {
-	var cart models.Cart
-	var mu sync.Mutex
-
-	mu.Lock()
-	defer mu.Unlock()
-
-	cartId, err := h.service.GetLastCartId()
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-	cartId++
-	cart.ID = &cartId
-	cart.Items = []models.CartItem{}
-
-	err = h.service.CreateCart(cart)
+	cart, err := h.service.CreateCart()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
@@ -60,12 +43,7 @@ func (h *HandleCart) GetCart(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var cart models.Cart
-	cart.ID = &cartID
-	cart.Items = []models.CartItem{}
-	var item models.CartItem
-
-	err = h.service.GetCart(&cart, item)
+	cart, err := h.service.GetCart(cartID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
