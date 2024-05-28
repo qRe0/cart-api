@@ -120,7 +120,7 @@ func (r *CartRepository) GetCart(cartID int) (*models.Cart, error) {
 
 	rows, err := r.db.Query(`SELECT * FROM items WHERE cart_id = $1`, cartID)
 	if err != nil {
-		return nil, myErrors.ErrGetItems
+		return nil, myErrors.ErrItemNotFound
 	}
 	defer rows.Close()
 
