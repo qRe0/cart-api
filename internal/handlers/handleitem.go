@@ -7,14 +7,14 @@ import (
 
 	errs "github.com/qRe0/innowise-cart-api/internal/errors"
 	"github.com/qRe0/innowise-cart-api/internal/models"
-	s "github.com/qRe0/innowise-cart-api/internal/service"
+	"github.com/qRe0/innowise-cart-api/internal/service"
 )
 
 type HandleItem struct {
-	service s.CartServiceInterface
+	service service.CartServiceInterface
 }
 
-func NewHandleItem(cs s.CartServiceInterface) *HandleItem {
+func NewHandleItem(cs service.CartServiceInterface) *HandleItem {
 	return &HandleItem{
 		service: cs,
 	}

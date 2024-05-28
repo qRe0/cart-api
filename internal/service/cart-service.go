@@ -5,14 +5,14 @@ import (
 
 	errs "github.com/qRe0/innowise-cart-api/internal/errors"
 	"github.com/qRe0/innowise-cart-api/internal/models"
-	r "github.com/qRe0/innowise-cart-api/internal/repository"
+	"github.com/qRe0/innowise-cart-api/internal/repository"
 )
 
 type CartService struct {
-	repo r.CartRepositoryInterface
+	repo repository.CartRepositoryInterface
 }
 
-func NewCartService(repo r.CartRepositoryInterface) *CartService {
+func NewCartService(repo repository.CartRepositoryInterface) *CartService {
 	return &CartService{
 		repo: repo,
 	}
