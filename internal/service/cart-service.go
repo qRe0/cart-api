@@ -9,10 +9,10 @@ import (
 )
 
 type CartService struct {
-	repo r.ICartRepository
+	repo r.CartRepositoryInterface
 }
 
-func NewCartService(repo r.ICartRepository) *CartService {
+func NewCartService(repo r.CartRepositoryInterface) *CartService {
 	return &CartService{
 		repo: repo,
 	}

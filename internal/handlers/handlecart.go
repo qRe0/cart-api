@@ -9,10 +9,10 @@ import (
 )
 
 type HandleCart struct {
-	service service.ICartService
+	service service.CartServiceInterface
 }
 
-func NewHandleCart(cs service.ICartService) *HandleCart {
+func NewHandleCart(cs service.CartServiceInterface) *HandleCart {
 	return &HandleCart{
 		service: cs,
 	}

@@ -7,7 +7,7 @@ type Handler struct {
 	HandleItem *HandleItem
 }
 
-func NewHandler(cs s.ICartService) *Handler {
+func NewHandler(cs s.CartServiceInterface) *Handler {
 	return &Handler{
 		HandleCart: NewHandleCart(cs),
 		HandleItem: NewHandleItem(cs),
