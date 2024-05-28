@@ -6,7 +6,7 @@ import (
 	"net/http"
 
 	"github.com/jmoiron/sqlx"
-	myErrors "github.com/qRe0/innowise-cart-api/internal/errors"
+	errs "github.com/qRe0/innowise-cart-api/internal/errors"
 	"github.com/qRe0/innowise-cart-api/internal/handlers"
 	repository "github.com/qRe0/innowise-cart-api/internal/repo"
 	"github.com/qRe0/innowise-cart-api/internal/service"
@@ -15,14 +15,14 @@ import (
 func Run() {
 	db, err := repository.Init()
 	if err != nil {
-		e := myErrors.ErrConnectingToDB
+		e := errs.ErrConnectingToDB
 		fmt.Println(e)
 	}
 
 	defer func(db *sqlx.DB) {
 		err := db.Close()
 		if err != nil {
-			e := myErrors.ErrClosingDB
+			e := errs.ErrClosingDB
 			panic(e)
 		}
 	}(db)

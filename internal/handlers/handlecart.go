@@ -4,15 +4,15 @@ import (
 	"encoding/json"
 	"net/http"
 
-	myErrors "github.com/qRe0/innowise-cart-api/internal/errors"
-	s "github.com/qRe0/innowise-cart-api/internal/service"
+	errs "github.com/qRe0/innowise-cart-api/internal/errors"
+	"github.com/qRe0/innowise-cart-api/internal/service"
 )
 
 type HandleCart struct {
-	service s.ICartService
+	service service.ICartService
 }
 
-func NewHandleCart(cs s.ICartService) *HandleCart {
+func NewHandleCart(cs service.ICartService) *HandleCart {
 	return &HandleCart{
 		service: cs,
 	}
@@ -47,7 +47,7 @@ func (h *HandleCart) GetCart(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	err = json.NewEncoder(w).Encode(cart)
 	if err != nil {
-		http.Error(w, myErrors.ErrEncodingJSON.Error(), http.StatusBadRequest)
+		http.Error(w, errs.ErrEncodingJSON.Error(), http.StatusBadRequest)
 		return
 	}
 }
