@@ -5,7 +5,8 @@ CREATE TABLE "items"(
                         "id" SERIAL NOT NULL,
                         "cart_id" INTEGER NOT NULL,
                         "product" TEXT NOT NULL,
-                        "quantity" INTEGER NOT NULL
+                        "quantity" INTEGER NOT NULL,
+                        UNIQUE (cart_id, product)
 );
 ALTER TABLE
     "items" ADD PRIMARY KEY("id");

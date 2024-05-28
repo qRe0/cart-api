@@ -65,7 +65,7 @@ func (r *CartRepository) AddItemToCart(cartID int, item models.CartItem) (*model
 		return nil, myErrors.ErrCartNotFound
 	}
 
-	_, err := r.db.Exec("INSERT INTO items (cart_id, product, quantity) VALUES ($1, $2, $3)", cartID, item.Product, item.Quantity)
+	_, err := r.db.Exec("INSERT INTO items (cart_id, product, quantity) VALUES ($1, $2, $3) ON CONFLICT (cart_id, product) DO UPDATE SET quantity = items.quantity + EXCLUDED.quantity", cartID, item.Product, item.Quantity)
 	if err != nil {
 		return nil, myErrors.ErrAddItemToCart
 	}
