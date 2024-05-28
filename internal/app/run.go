@@ -13,7 +13,11 @@ import (
 )
 
 func Run() {
-	db := repository.Init()
+	db, err := repository.Init()
+	if err != nil {
+		e := myErrors.ErrConnectingToDB
+		fmt.Println(e)
+	}
 
 	defer func(db *sqlx.DB) {
 		err := db.Close()
