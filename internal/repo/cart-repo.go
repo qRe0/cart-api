@@ -49,9 +49,7 @@ func (r *CartRepository) CreateCart() (*models.Cart, error) {
 	}
 
 	cart := models.Cart{
-		Entity: models.Entity{
-			ID: &id,
-		},
+		ID:    id,
 		Items: []models.CartItem{},
 	}
 
@@ -80,9 +78,7 @@ func (r *CartRepository) AddItemToCart(cartID int, item models.CartItem) (*model
 		return nil, errs.ErrGettingLastItemID
 	}
 	item = models.CartItem{
-		Entity: models.Entity{
-			ID: &id,
-		},
+		ID:       id,
 		CartID:   cartID,
 		Product:  item.Product,
 		Quantity: item.Quantity,
@@ -126,7 +122,7 @@ func (r *CartRepository) GetCart(cartID int) (*models.Cart, error) {
 
 	item := models.CartItem{}
 	cart := models.Cart{}
-	cart.ID = &cartID
+	cart.ID = cartID
 	for rows.Next() {
 		err = rows.Scan(&item.ID, &item.CartID, &item.Product, &item.Quantity)
 		if err != nil {
