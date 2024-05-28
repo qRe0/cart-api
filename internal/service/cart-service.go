@@ -5,7 +5,7 @@ import (
 
 	errs "github.com/qRe0/innowise-cart-api/internal/errors"
 	"github.com/qRe0/innowise-cart-api/internal/models"
-	r "github.com/qRe0/innowise-cart-api/internal/repo"
+	r "github.com/qRe0/innowise-cart-api/internal/repository"
 )
 
 type CartService struct {

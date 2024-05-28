@@ -8,7 +8,7 @@ import (
 	"github.com/jmoiron/sqlx"
 	errs "github.com/qRe0/innowise-cart-api/internal/errors"
 	"github.com/qRe0/innowise-cart-api/internal/handlers"
-	repository "github.com/qRe0/innowise-cart-api/internal/repo"
+	"github.com/qRe0/innowise-cart-api/internal/repository"
 	"github.com/qRe0/innowise-cart-api/internal/service"
 )
 
