@@ -37,13 +37,13 @@ func Init() (*sqlx.DB, error) {
 }
 
 func (r *CartRepository) CreateCart() (*models.Cart, error) {
-	_, err := r.db.Exec("INSERT INTO carts DEFAULT VALUES ")
+	_, err := r.db.Exec(`INSERT INTO carts DEFAULT VALUES `)
 	if err != nil {
 		return nil, myErrors.ErrCreatingCart
 	}
 
 	var id int
-	err = r.db.QueryRow("SELECT MAX(id) from carts").Scan(&id)
+	err = r.db.QueryRow(`SELECT MAX(id) from carts`).Scan(&id)
 	if err != nil {
 		return nil, myErrors.ErrWrongCartID
 	}
@@ -60,12 +60,17 @@ func (r *CartRepository) CreateCart() (*models.Cart, error) {
 
 func (r *CartRepository) AddItemToCart(cartID int, item models.CartItem) (*models.CartItem, error) {
 	var cartCount int
-	_ = r.db.QueryRow("SELECT COUNT(id) FROM carts WHERE id = $1", cartID).Scan(&cartCount)
+	_ = r.db.QueryRow(`SELECT COUNT(id) FROM carts WHERE id = $1`, cartID).Scan(&cartCount)
 	if cartCount == 0 {
 		return nil, myErrors.ErrCartNotFound
 	}
 
-	_, err := r.db.Exec("INSERT INTO items (cart_id, product, quantity) VALUES ($1, $2, $3) ON CONFLICT (cart_id, product) DO UPDATE SET quantity = items.quantity + EXCLUDED.quantity", cartID, item.Product, item.Quantity)
+	_, err := r.db.Exec(`
+    INSERT INTO items (cart_id, product, quantity) 
+    VALUES ($1, $2, $3)
+    ON CONFLICT (cart_id, product) 
+    DO UPDATE SET quantity = items.quantity + EXCLUDED.quantity`,
+		cartID, item.Product, item.Quantity)
 	if err != nil {
 		return nil, myErrors.ErrAddItemToCart
 	}
@@ -88,17 +93,17 @@ func (r *CartRepository) AddItemToCart(cartID int, item models.CartItem) (*model
 
 func (r *CartRepository) RemoveItemFromCart(cartID, itemID int) error {
 	var itemCount, cartCount int
-	_ = r.db.QueryRow("SELECT COUNT(id) FROM carts WHERE id = $1", cartID).Scan(&cartCount)
+	_ = r.db.QueryRow(`SELECT COUNT(id) FROM carts WHERE id = $1`, cartID).Scan(&cartCount)
 	if cartCount == 0 {
 		return myErrors.ErrCartNotFound
 	}
 
-	_ = r.db.QueryRow("SELECT COUNT(id) FROM items WHERE id = $1 AND cart_id = $2", itemID, cartID).Scan(&itemCount)
+	_ = r.db.QueryRow(`SELECT COUNT(id) FROM items WHERE id = $1 AND cart_id = $2`, itemID, cartID).Scan(&itemCount)
 	if itemCount == 0 {
 		return myErrors.ErrItemNotFound
 	}
 
-	_, err := r.db.Exec("DELETE FROM items WHERE id = $1 AND cart_id = $2", itemID, cartID)
+	_, err := r.db.Exec(`DELETE FROM items WHERE id = $1 AND cart_id = $2`, itemID, cartID)
 	if err != nil {
 		return myErrors.ErrRemoveItemFromCart
 	}
@@ -108,12 +113,12 @@ func (r *CartRepository) RemoveItemFromCart(cartID, itemID int) error {
 
 func (r *CartRepository) GetCart(cartID int) (*models.Cart, error) {
 	var cartCount int
-	_ = r.db.QueryRow("SELECT COUNT(*) FROM carts WHERE id = $1", cartID).Scan(&cartCount)
+	_ = r.db.QueryRow(`SELECT COUNT(*) FROM carts WHERE id = $1`, cartID).Scan(&cartCount)
 	if cartCount == 0 {
 		return nil, myErrors.ErrCartNotFound
 	}
 
-	rows, err := r.db.Query("SELECT * FROM items WHERE cart_id = $1", cartID)
+	rows, err := r.db.Query(`SELECT * FROM items WHERE cart_id = $1`, cartID)
 	if err != nil {
 		return nil, myErrors.ErrGetItems
 	}
@@ -135,7 +140,7 @@ func (r *CartRepository) GetCart(cartID int) (*models.Cart, error) {
 
 func (r *CartRepository) GetLastItemID() (int, error) {
 	var id int
-	err := r.db.QueryRow("SELECT MAX(id) FROM items").Scan(&id)
+	err := r.db.QueryRow(`SELECT MAX(id) FROM items`).Scan(&id)
 	if err != nil {
 		return 0, myErrors.ErrGettingLastItemID
 	}
