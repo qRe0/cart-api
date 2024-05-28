@@ -3,7 +3,7 @@ version: '3'
 services:
   database:
     image: postgres:latest
-    container_name: cart_api_database
+    container_name: cart_database
     restart: "no"
     environment:
       POSTGRES_USER: pgadmin
@@ -11,12 +11,25 @@ services:
       POSTGRES_DB: cart_api
     ports:
       - "5432:5432"
+    volumes:
+      - ./internal/database/database.sql:/docker-entrypoint-initdb.d/database.sql
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U pgadmin -d cart_api" ]
+      interval: 2s
+      timeout: 2s
+      retries: 3
 
-  web:
+  api:
+    depends_on:
+      database:
+        condition: service_healthy
     build: .
-    container_name: cart_api_web
+    container_name: cart_api
     restart: "no"
     ports:
       - "3000:3000"
-    depends_on:
-      - database
+    environment:
+      DB_HOST: database
+      DB_USER: pgadmin
+      DB_PASSWORD: 24112004
+      DB_NAME: cart_api
