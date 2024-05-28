@@ -21,7 +21,8 @@ func NewCartRepository(db *sqlx.DB) *CartRepository {
 }
 
 func Init() (*sqlx.DB, error) {
-	db, err := sqlx.Open("postgres", "user=pgadmin password=24112004 dbname=cart_api host=database sslmode=disable")
+	const connStr = "user=pgadmin password=24112004 dbname=cart_api host=database sslmode=disable"
+	db, err := sqlx.Open("postgres", connStr)
 	if err != nil {
 		return nil, err
 	}
