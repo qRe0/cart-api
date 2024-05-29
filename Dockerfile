@@ -16,6 +16,7 @@ RUN apk --no-cache add ca-certificates postgresql-client
 WORKDIR /root/
 
 COPY --from=builder /app/start .
+COPY --from=builder /app/.env .
 
 EXPOSE 3000
 

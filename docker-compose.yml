@@ -28,8 +28,3 @@ services:
     restart: "no"
     ports:
       - "3000:3000"
-    environment:
-      - DB_HOST=${DATABASE_HOST}
-      - DB_USER=${DATABASE_USER}
-      - DB_PASSWORD=${DATABASE_PASSWORD}
-      - DB_NAME=${DATABASE_NAME}

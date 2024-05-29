@@ -2,12 +2,13 @@ package repository
 
 import (
 	"log"
+	"os"
 
 	"github.com/jmoiron/sqlx"
+	"github.com/joho/godotenv"
+	_ "github.com/lib/pq"
 	errs "github.com/qRe0/innowise-cart-api/internal/errors"
 	"github.com/qRe0/innowise-cart-api/internal/models"
-
-	_ "github.com/lib/pq"
 )
 
 type CartRepository struct {
@@ -21,7 +22,17 @@ func NewCartRepository(db *sqlx.DB) *CartRepository {
 }
 
 func Init() (*sqlx.DB, error) {
-	const connStr = "user=pgadmin password=24112004 dbname=cart_api host=database sslmode=disable"
+	err := godotenv.Load()
+	if err != nil {
+		return nil, err
+	}
+
+	connStr := "user=" + os.Getenv("DATABASE_USER") +
+		" password=" + os.Getenv("DATABASE_PASSWORD") +
+		" dbname=" + os.Getenv("DATABASE_NAME") +
+		" host=" + os.Getenv("DATABASE_HOST") +
+		" sslmode=disable"
+
 	db, err := sqlx.Open("postgres", connStr)
 	if err != nil {
 		return nil, err
