@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"regexp"
 
-	errs "github.com/qRe0/innowise-cart-api/internal/errors"
 	"github.com/qRe0/innowise-cart-api/internal/models"
 	"github.com/qRe0/innowise-cart-api/internal/service"
 )
@@ -56,7 +55,7 @@ func (h *ItemHandler) RemoveItemFromCart(w http.ResponseWriter, r *http.Request)
 		cartIDStr = matches[1]
 		itemIDStr = matches[2]
 	} else {
-		http.Error(w, errs.ErrInvalidURLFormat.Error(), http.StatusBadRequest)
+		http.Error(w, "error in URL", http.StatusBadRequest)
 	}
 
 	err := h.service.RemoveItemFromCart(cartIDStr, itemIDStr)
@@ -68,7 +67,7 @@ func (h *ItemHandler) RemoveItemFromCart(w http.ResponseWriter, r *http.Request)
 	w.Header().Set("Content-Type", "application/json")
 	_, err = w.Write([]byte("{}"))
 	if err != nil {
-		http.Error(w, errs.ErrEncodingJSON.Error(), http.StatusBadRequest)
+		http.Error(w, "error encoding", http.StatusBadRequest)
 		return
 	}
 }
