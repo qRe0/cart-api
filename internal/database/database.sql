@@ -1,14 +1,14 @@
-CREATE TABLE "carts"("id" SERIAL NOT NULL);
-ALTER TABLE
-    "carts" ADD PRIMARY KEY("id");
-CREATE TABLE "items"(
-                        "id" SERIAL NOT NULL,
-                        "cart_id" INTEGER NOT NULL,
-                        "product" TEXT NOT NULL,
-                        "quantity" INTEGER NOT NULL,
-                        UNIQUE (cart_id, product)
+CREATE TABLE "carts"
+(
+    "id" SERIAL PRIMARY KEY
 );
-ALTER TABLE
-    "items" ADD PRIMARY KEY("id");
-ALTER TABLE
-    "items" ADD CONSTRAINT "items_cart_id_foreign" FOREIGN KEY("cart_id") REFERENCES "carts"("id");
+
+CREATE TABLE "items"
+(
+    "id"       SERIAL PRIMARY KEY,
+    "cart_id"  INTEGER NOT NULL,
+    "product"  TEXT    NOT NULL,
+    "quantity" INTEGER NOT NULL,
+    UNIQUE (cart_id, product),
+    CONSTRAINT "items_cart_id_foreign" FOREIGN KEY ("cart_id") REFERENCES "carts" ("id") ON DELETE CASCADE
+);
