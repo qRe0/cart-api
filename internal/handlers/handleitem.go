@@ -10,17 +10,17 @@ import (
 	"github.com/qRe0/innowise-cart-api/internal/service"
 )
 
-type HandleItem struct {
+type ItemHandler struct {
 	service service.CartServiceInterface
 }
 
-func NewHandleItem(cs service.CartServiceInterface) *HandleItem {
-	return &HandleItem{
+func NewHandleItem(cs service.CartServiceInterface) *ItemHandler {
+	return &ItemHandler{
 		service: cs,
 	}
 }
 
-func (h *HandleItem) AddItemToCart(w http.ResponseWriter, r *http.Request) {
+func (h *ItemHandler) AddItemToCart(w http.ResponseWriter, r *http.Request) {
 	cartIDStr := r.URL.Path[len("/carts/"):]
 	cartIDStr = cartIDStr[:len(cartIDStr)-len("/items")]
 
@@ -46,7 +46,7 @@ func (h *HandleItem) AddItemToCart(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (h *HandleItem) RemoveItemFromCart(w http.ResponseWriter, r *http.Request) {
+func (h *ItemHandler) RemoveItemFromCart(w http.ResponseWriter, r *http.Request) {
 	path := r.URL.Path
 	re := regexp.MustCompile(`/carts/(\d+)/items/(\d+)`)
 	matches := re.FindStringSubmatch(path)

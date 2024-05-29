@@ -31,15 +31,15 @@ func Run() {
 	cartService := service.NewCartService(cartRepo)
 	handler := handlers.NewHandler(cartService)
 
-	http.HandleFunc("/carts", handler.HandleCart.CreateCart)
+	http.HandleFunc("/carts", handler.CartHandler.CreateCart)
 	http.HandleFunc("/carts/", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodPost:
-			handler.HandleItem.AddItemToCart(w, r)
+			handler.ItemHandler.AddItemToCart(w, r)
 		case http.MethodGet:
-			handler.HandleCart.GetCart(w, r)
+			handler.CartHandler.GetCart(w, r)
 		case http.MethodDelete:
-			handler.HandleItem.RemoveItemFromCart(w, r)
+			handler.ItemHandler.RemoveItemFromCart(w, r)
 		}
 	})
 

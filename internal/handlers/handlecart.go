@@ -8,17 +8,17 @@ import (
 	"github.com/qRe0/innowise-cart-api/internal/service"
 )
 
-type HandleCart struct {
+type CartHandler struct {
 	service service.CartServiceInterface
 }
 
-func NewHandleCart(cs service.CartServiceInterface) *HandleCart {
-	return &HandleCart{
+func NewHandleCart(cs service.CartServiceInterface) *CartHandler {
+	return &CartHandler{
 		service: cs,
 	}
 }
 
-func (h *HandleCart) CreateCart(w http.ResponseWriter, r *http.Request) {
+func (h *CartHandler) CreateCart(w http.ResponseWriter, r *http.Request) {
 	cart, err := h.service.CreateCart()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
@@ -34,7 +34,7 @@ func (h *HandleCart) CreateCart(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (h *HandleCart) GetCart(w http.ResponseWriter, r *http.Request) {
+func (h *CartHandler) GetCart(w http.ResponseWriter, r *http.Request) {
 	cartIDStr := r.URL.Path[len("/carts/"):]
 
 	cart, err := h.service.GetCart(cartIDStr)
