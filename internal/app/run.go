@@ -22,7 +22,7 @@ func Run() {
 		err := db.Close()
 		if err != nil {
 			e := errs.ErrClosingDB
-			panic(e)
+			log.Fatalln(e)
 		}
 	}(db)
 
