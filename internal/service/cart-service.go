@@ -24,13 +24,13 @@ func (c *CartService) CreateCart() (*models.Cart, error) {
 
 func (c *CartService) AddItemToCart(cartIDStr string, item models.CartItem) (*models.CartItem, error) {
 	cartID, err := strconv.Atoi(cartIDStr)
-	if err != nil {
+	if err != nil || cartID <= 0 {
 		return nil, errs.ErrWrongCartID
-	} else if cartID <= 0 {
-		return nil, errs.ErrWrongCartID
-	} else if item.Product == "" {
+	}
+	if item.Product == "" {
 		return nil, errs.ErrEmptyProductName
-	} else if item.Quantity <= 0 {
+	}
+	if item.Quantity <= 0 {
 		return nil, errs.ErrWrongItemQuantity
 	}
 
@@ -39,17 +39,12 @@ func (c *CartService) AddItemToCart(cartIDStr string, item models.CartItem) (*mo
 
 func (c *CartService) RemoveItemFromCart(cartIDStr, itemIDStr string) error {
 	cartID, err := strconv.Atoi(cartIDStr)
-	if err != nil {
+	if err != nil || cartID <= 0 {
 		return errs.ErrWrongCartID
-	}
-	itemID, err := strconv.Atoi(itemIDStr)
-	if err != nil {
-		return errs.ErrWrongItemID
 	}
 
-	if cartID <= 0 {
-		return errs.ErrWrongCartID
-	} else if itemID <= 0 {
+	itemID, err := strconv.Atoi(itemIDStr)
+	if err != nil || itemID <= 0 {
 		return errs.ErrWrongItemID
 	}
 
