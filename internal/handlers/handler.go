@@ -9,7 +9,7 @@ type Handler struct {
 
 func NewHandler(cs service.CartServiceInterface) *Handler {
 	return &Handler{
-		CartHandler: NewHandleCart(cs),
-		ItemHandler: NewHandleItem(cs),
+		CartHandler: NewCartHandler(cs),
+		ItemHandler: NewItemHandler(cs),
 	}
 }

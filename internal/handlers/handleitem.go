@@ -13,7 +13,7 @@ type ItemHandler struct {
 	service service.CartServiceInterface
 }
 
-func NewHandleItem(cs service.CartServiceInterface) *ItemHandler {
+func NewItemHandler(cs service.CartServiceInterface) *ItemHandler {
 	return &ItemHandler{
 		service: cs,
 	}
