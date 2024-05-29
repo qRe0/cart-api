@@ -29,7 +29,7 @@ func (h *CartHandler) CreateCart(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusCreated)
 	err = json.NewEncoder(w).Encode(cart)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		http.Error(w, "error encoding", http.StatusBadRequest)
 		return
 	}
 }

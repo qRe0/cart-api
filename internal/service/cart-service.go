@@ -1,6 +1,8 @@
 package service
 
 import (
+	"database/sql"
+	"errors"
 	"strconv"
 
 	errs "github.com/qRe0/innowise-cart-api/internal/errors"
@@ -19,7 +21,15 @@ func NewCartService(repo repository.CartRepositoryInterface) *CartService {
 }
 
 func (c *CartService) CreateCart() (*models.Cart, error) {
-	return c.repo.CreateCart()
+	cart, err := c.repo.CreateCart()
+
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, errs.ErrCreatingCart
+		}
+	}
+
+	return cart, nil
 }
 
 func (c *CartService) AddItemToCart(cartIDStr string, item models.CartItem) (*models.CartItem, error) {
@@ -34,7 +44,13 @@ func (c *CartService) AddItemToCart(cartIDStr string, item models.CartItem) (*mo
 		return nil, errs.ErrWrongItemQuantity
 	}
 
-	return c.repo.AddItemToCart(cartID, item)
+	item.CartID = cartID
+	result, err := c.repo.AddItemToCart(item)
+	if err != nil {
+		return nil, errs.ErrCartNotFound
+	}
+
+	return result, nil
 }
 
 func (c *CartService) RemoveItemFromCart(cartIDStr, itemIDStr string) error {

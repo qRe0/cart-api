@@ -19,7 +19,7 @@ const (
 	insertItemQuery = `INSERT INTO items (cart_id, product, quantity) 
     	VALUES ($1, $2, $3)
     	ON CONFLICT (cart_id, product) 
-    	DO UPDATE SET quantity = items.quantity + EXCLUDED.quantity`
+    	DO UPDATE SET quantity = items.quantity + EXCLUDED.quantity RETURNING id`
 	itemCountQuery  = `SELECT COUNT(id) FROM items WHERE id = $1 AND cart_id = $2`
 	deleteItemQuery = `DELETE FROM items WHERE id = $1 AND cart_id = $2`
 	selectItemQuery = `SELECT * FROM items WHERE cart_id = $1`
@@ -66,13 +66,13 @@ func Init() (*sqlx.DB, error) {
 func (r *CartRepository) CreateCart() (*models.Cart, error) {
 	_, err := r.db.Exec(createCartQuery)
 	if err != nil {
-		return nil, errs.ErrCreatingCart
+		return nil, err
 	}
 
 	var id int
 	err = r.db.QueryRow(maxCartIDQuery).Scan(&id)
 	if err != nil {
-		return nil, errs.ErrWrongCartID
+		return nil, err
 	}
 
 	cart := models.Cart{
@@ -83,29 +83,14 @@ func (r *CartRepository) CreateCart() (*models.Cart, error) {
 	return &cart, nil
 }
 
-func (r *CartRepository) AddItemToCart(cartID int, item models.CartItem) (*models.CartItem, error) {
-	var cartCount int
-	_ = r.db.QueryRow(cartCountQuery, cartID).Scan(&cartCount)
-	if cartCount == 0 {
-		return nil, errs.ErrCartNotFound
-	}
-
-	_, err := r.db.Exec(insertItemQuery, cartID, item.Product, item.Quantity)
+func (r *CartRepository) AddItemToCart(item models.CartItem) (*models.CartItem, error) {
+	var id int
+	err := r.db.QueryRow(insertItemQuery, item.CartID, item.Product, item.Quantity).Scan(&id)
 	if err != nil {
-		return nil, errs.ErrAddItemToCart
+		return nil, err
 	}
 
-	id, err := r.GetLastItemID()
-	if err != nil {
-		return nil, errs.ErrGettingLastItemID
-	}
-	item = models.CartItem{
-		ID:       id,
-		CartID:   cartID,
-		Product:  item.Product,
-		Quantity: item.Quantity,
-	}
-
+	item.ID = id
 	return &item, nil
 }
 

@@ -27,7 +27,7 @@ func (h *ItemHandler) AddItemToCart(w http.ResponseWriter, r *http.Request) {
 	var parsedItem models.CartItem
 	err := json.NewDecoder(r.Body).Decode(&parsedItem)
 	if err != nil {
-		http.Error(w, errs.ErrDecodingReqBody.Error(), http.StatusBadRequest)
+		http.Error(w, "error decoding request body", http.StatusBadRequest)
 		return
 	}
 
@@ -41,7 +41,7 @@ func (h *ItemHandler) AddItemToCart(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	err = json.NewEncoder(w).Encode(item)
 	if err != nil {
-		http.Error(w, errs.ErrEncodingJSON.Error(), http.StatusBadRequest)
+		http.Error(w, "error encoding", http.StatusBadRequest)
 		return
 	}
 }
