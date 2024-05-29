@@ -6,9 +6,9 @@ services:
     container_name: cart_database
     restart: "no"
     environment:
-      POSTGRES_USER: pgadmin
-      POSTGRES_PASSWORD: 24112004
-      POSTGRES_DB: cart_api
+      - POSTGRES_USER=${DATABASE_USER}
+      - POSTGRES_PASSWORD=${DATABASE_PASSWORD}
+      - POSTGRES_DB=${DATABASE_NAME}
     ports:
       - "5432:5432"
     volumes:
@@ -29,7 +29,7 @@ services:
     ports:
       - "3000:3000"
     environment:
-      DB_HOST: database
-      DB_USER: pgadmin
-      DB_PASSWORD: 24112004
-      DB_NAME: cart_api
+      - DB_HOST=${DATABASE_HOST}
+      - DB_USER=${DATABASE_USER}
+      - DB_PASSWORD=${DATABASE_PASSWORD}
+      - DB_NAME=${DATABASE_NAME}
