@@ -11,6 +11,20 @@ import (
 	"github.com/qRe0/innowise-cart-api/internal/models"
 )
 
+const (
+	createCartQuery = `INSERT INTO carts DEFAULT VALUES`
+	maxCartIDQuery  = `SELECT MAX(id) FROM carts`
+	cartCountQuery  = `SELECT COUNT(id) FROM carts WHERE id = $1`
+	insertItemQuery = `INSERT INTO items (cart_id, product, quantity) 
+    	VALUES ($1, $2, $3)
+    	ON CONFLICT (cart_id, product) 
+    	DO UPDATE SET quantity = items.quantity + EXCLUDED.quantity`
+	itemCountQuery  = `SELECT COUNT(id) FROM items WHERE id = $1 AND cart_id = $2`
+	deleteItemQuery = `DELETE FROM items WHERE id = $1 AND cart_id = $2`
+	selectItemQuery = `SELECT * FROM items WHERE cart_id = $1`
+	maxItemIDQuery  = `SELECT MAX(id) FROM items`
+)
+
 type CartRepository struct {
 	db *sqlx.DB
 }
@@ -49,13 +63,13 @@ func Init() (*sqlx.DB, error) {
 }
 
 func (r *CartRepository) CreateCart() (*models.Cart, error) {
-	_, err := r.db.Exec(`INSERT INTO carts DEFAULT VALUES `)
+	_, err := r.db.Exec(createCartQuery)
 	if err != nil {
 		return nil, errs.ErrCreatingCart
 	}
 
 	var id int
-	err = r.db.QueryRow(`SELECT MAX(id) from carts`).Scan(&id)
+	err = r.db.QueryRow(maxCartIDQuery).Scan(&id)
 	if err != nil {
 		return nil, errs.ErrWrongCartID
 	}
@@ -70,17 +84,12 @@ func (r *CartRepository) CreateCart() (*models.Cart, error) {
 
 func (r *CartRepository) AddItemToCart(cartID int, item models.CartItem) (*models.CartItem, error) {
 	var cartCount int
-	_ = r.db.QueryRow(`SELECT COUNT(id) FROM carts WHERE id = $1`, cartID).Scan(&cartCount)
+	_ = r.db.QueryRow(cartCountQuery, cartID).Scan(&cartCount)
 	if cartCount == 0 {
 		return nil, errs.ErrCartNotFound
 	}
 
-	_, err := r.db.Exec(`
-    INSERT INTO items (cart_id, product, quantity) 
-    VALUES ($1, $2, $3)
-    ON CONFLICT (cart_id, product) 
-    DO UPDATE SET quantity = items.quantity + EXCLUDED.quantity`,
-		cartID, item.Product, item.Quantity)
+	_, err := r.db.Exec(insertItemQuery, cartID, item.Product, item.Quantity)
 	if err != nil {
 		return nil, errs.ErrAddItemToCart
 	}
@@ -101,17 +110,17 @@ func (r *CartRepository) AddItemToCart(cartID int, item models.CartItem) (*model
 
 func (r *CartRepository) RemoveItemFromCart(cartID, itemID int) error {
 	var itemCount, cartCount int
-	_ = r.db.QueryRow(`SELECT COUNT(id) FROM carts WHERE id = $1`, cartID).Scan(&cartCount)
+	_ = r.db.QueryRow(cartCountQuery, cartID).Scan(&cartCount)
 	if cartCount == 0 {
 		return errs.ErrCartNotFound
 	}
 
-	_ = r.db.QueryRow(`SELECT COUNT(id) FROM items WHERE id = $1 AND cart_id = $2`, itemID, cartID).Scan(&itemCount)
+	_ = r.db.QueryRow(itemCountQuery, itemID, cartID).Scan(&itemCount)
 	if itemCount == 0 {
 		return errs.ErrItemNotFound
 	}
 
-	_, err := r.db.Exec(`DELETE FROM items WHERE id = $1 AND cart_id = $2`, itemID, cartID)
+	_, err := r.db.Exec(deleteItemQuery, itemID, cartID)
 	if err != nil {
 		return errs.ErrRemoveItemFromCart
 	}
@@ -121,12 +130,12 @@ func (r *CartRepository) RemoveItemFromCart(cartID, itemID int) error {
 
 func (r *CartRepository) GetCart(cartID int) (*models.Cart, error) {
 	var cartCount int
-	_ = r.db.QueryRow(`SELECT COUNT(*) FROM carts WHERE id = $1`, cartID).Scan(&cartCount)
+	_ = r.db.QueryRow(cartCountQuery, cartID).Scan(&cartCount)
 	if cartCount == 0 {
 		return nil, errs.ErrCartNotFound
 	}
 
-	rows, err := r.db.Query(`SELECT * FROM items WHERE cart_id = $1`, cartID)
+	rows, err := r.db.Query(selectItemQuery, cartID)
 	if err != nil {
 		return nil, errs.ErrItemNotFound
 	}
@@ -148,7 +157,7 @@ func (r *CartRepository) GetCart(cartID int) (*models.Cart, error) {
 
 func (r *CartRepository) GetLastItemID() (int, error) {
 	var id int
-	err := r.db.QueryRow(`SELECT MAX(id) FROM items`).Scan(&id)
+	err := r.db.QueryRow(maxItemIDQuery).Scan(&id)
 	if err != nil {
 		return 0, errs.ErrGettingLastItemID
 	}
