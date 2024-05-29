@@ -15,8 +15,7 @@ import (
 func Run() {
 	db, err := repository.Init()
 	if err != nil {
-		e := errs.ErrConnectingToDB
-		log.Fatalln(e)
+		log.Fatalln(err)
 	}
 
 	defer func(db *sqlx.DB) {

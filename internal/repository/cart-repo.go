@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"fmt"
 	"log"
 	"os"
 
@@ -38,7 +39,7 @@ func NewCartRepository(db *sqlx.DB) *CartRepository {
 func Init() (*sqlx.DB, error) {
 	err := godotenv.Load()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to load enviromental variables: %w", err)
 	}
 
 	connStr := "user=" + os.Getenv("DATABASE_USER") +
@@ -49,12 +50,12 @@ func Init() (*sqlx.DB, error) {
 
 	db, err := sqlx.Open("postgres", connStr)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to open database: %w", err)
 	}
 
 	err = db.Ping()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to ping database: %w", err)
 	}
 
 	log.Println("Connected to DB successfully!")
