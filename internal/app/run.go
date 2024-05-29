@@ -49,7 +49,7 @@ func Run() {
 		log.Fatalf("failed to load enviromental variables: %v", err)
 	}
 
-	port := fmt.Sprintf(":%s", os.Getenv("SERVER_PORT"))
+	port := fmt.Sprintf(":%s", os.Getenv("API_PORT"))
 
 	log.Printf("Server is running on port %s", port)
 	log.Fatalln(http.ListenAndServe(port, nil))
