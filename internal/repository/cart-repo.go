@@ -22,7 +22,7 @@ const (
     	DO UPDATE SET quantity = items.quantity + EXCLUDED.quantity RETURNING id`
 	itemCountQuery  = `SELECT COUNT(id) FROM items WHERE id = $1 AND cart_id = $2`
 	deleteItemQuery = `DELETE FROM items WHERE id = $1 AND cart_id = $2`
-	selectItemQuery = `SELECT * FROM items WHERE cart_id = $1`
+	selectItemQuery = `SELECT id, cart_id, product, quantity FROM items WHERE cart_id = $1`
 )
 
 type CartRepository struct {
