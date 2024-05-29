@@ -23,7 +23,6 @@ const (
 	itemCountQuery  = `SELECT COUNT(id) FROM items WHERE id = $1 AND cart_id = $2`
 	deleteItemQuery = `DELETE FROM items WHERE id = $1 AND cart_id = $2`
 	selectItemQuery = `SELECT * FROM items WHERE cart_id = $1`
-	maxItemIDQuery  = `SELECT MAX(id) FROM items`
 )
 
 type CartRepository struct {
@@ -139,14 +138,4 @@ func (r *CartRepository) GetCart(cartID int) (*models.Cart, error) {
 	}
 
 	return &cart, nil
-}
-
-func (r *CartRepository) GetLastItemID() (int, error) {
-	var id int
-	err := r.db.QueryRow(maxItemIDQuery).Scan(&id)
-	if err != nil {
-		return 0, errs.ErrGettingLastItemID
-	}
-
-	return id, nil
 }
