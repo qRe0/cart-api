@@ -4,8 +4,10 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/jmoiron/sqlx"
+	"github.com/joho/godotenv"
 	errs "github.com/qRe0/innowise-cart-api/internal/errors"
 	"github.com/qRe0/innowise-cart-api/internal/handlers"
 	"github.com/qRe0/innowise-cart-api/internal/repository"
@@ -42,6 +44,13 @@ func Run() {
 		}
 	})
 
-	fmt.Println("Server is running on port :3000")
-	log.Fatalln(http.ListenAndServe(":3000", nil))
+	err = godotenv.Load()
+	if err != nil {
+		log.Fatalf("failed to load enviromental variables: %v", err)
+	}
+
+	port := fmt.Sprintf(":%s", os.Getenv("SERVER_PORT"))
+
+	log.Printf("Server is running on port %s", port)
+	log.Fatalln(http.ListenAndServe(port, nil))
 }
