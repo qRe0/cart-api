@@ -64,6 +64,15 @@ func (c *CartService) RemoveItemFromCart(cartIDStr, itemIDStr string) error {
 		return errs.ErrWrongItemID
 	}
 
+	cartExists, err := c.repo.IsCartExist(cartID)
+	if !cartExists || err != nil {
+		return errs.ErrCartNotFound
+	}
+	itemExists, err := c.repo.IsItemExist(itemID, cartID)
+	if !itemExists || err != nil {
+		return errs.ErrItemNotFound
+	}
+
 	return c.repo.RemoveItemFromCart(cartID, itemID)
 }
 

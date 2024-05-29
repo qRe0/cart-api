@@ -8,7 +8,6 @@ import (
 	"github.com/jmoiron/sqlx"
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
-	errs "github.com/qRe0/innowise-cart-api/internal/errors"
 	"github.com/qRe0/innowise-cart-api/internal/models"
 )
 
@@ -94,30 +93,29 @@ func (r *CartRepository) AddItemToCart(item models.CartItem) (*models.CartItem, 
 }
 
 func (r *CartRepository) RemoveItemFromCart(cartID, itemID int) error {
-	var itemCount, cartCount int
-	_ = r.db.QueryRow(cartCountQuery, cartID).Scan(&cartCount)
-	if cartCount == 0 {
-		return errs.ErrCartNotFound
-	}
-
-	_ = r.db.QueryRow(itemCountQuery, itemID, cartID).Scan(&itemCount)
-	if itemCount == 0 {
-		return errs.ErrItemNotFound
-	}
-
 	_, err := r.db.Exec(deleteItemQuery, itemID, cartID)
 	if err != nil {
-		return errs.ErrRemoveItemFromCart
+		return err
 	}
 
 	return nil
 }
 
+func (r *CartRepository) IsItemExist(itemID, cartID int) (bool, error) {
+	var count int
+	err := r.db.QueryRow(itemCountQuery, itemID, cartID).Scan(&count)
+	if count == 0 {
+		return false, err
+	}
+
+	return true, nil
+}
+
 func (r *CartRepository) IsCartExist(cartID int) (bool, error) {
 	var count int
-	_ = r.db.QueryRow(cartCountQuery, cartID).Scan(&count)
+	err := r.db.QueryRow(cartCountQuery, cartID).Scan(&count)
 	if count == 0 {
-		return false, nil
+		return false, err
 	}
 
 	return true, nil
