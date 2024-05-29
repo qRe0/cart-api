@@ -113,16 +113,20 @@ func (r *CartRepository) RemoveItemFromCart(cartID, itemID int) error {
 	return nil
 }
 
-func (r *CartRepository) GetCart(cartID int) (*models.Cart, error) {
-	var cartCount int
-	_ = r.db.QueryRow(cartCountQuery, cartID).Scan(&cartCount)
-	if cartCount == 0 {
-		return nil, errs.ErrCartNotFound
+func (r *CartRepository) IsCartExist(cartID int) (bool, error) {
+	var count int
+	_ = r.db.QueryRow(cartCountQuery, cartID).Scan(&count)
+	if count == 0 {
+		return false, nil
 	}
 
+	return true, nil
+}
+
+func (r *CartRepository) GetCart(cartID int) (*models.Cart, error) {
 	rows, err := r.db.Query(selectItemQuery, cartID)
 	if err != nil {
-		return nil, errs.ErrItemNotFound
+		return nil, err
 	}
 	defer rows.Close()
 
@@ -132,7 +136,7 @@ func (r *CartRepository) GetCart(cartID int) (*models.Cart, error) {
 	for rows.Next() {
 		err = rows.Scan(&item.ID, &item.CartID, &item.Product, &item.Quantity)
 		if err != nil {
-			return nil, errs.ErrRowsScan
+			return nil, err
 		}
 		cart.Items = append(cart.Items, item)
 	}

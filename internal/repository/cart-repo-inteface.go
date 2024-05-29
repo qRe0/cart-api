@@ -7,4 +7,5 @@ type CartRepositoryInterface interface {
 	AddItemToCart(item models.CartItem) (*models.CartItem, error)
 	RemoveItemFromCart(cartID, itemID int) error
 	GetCart(cartID int) (*models.Cart, error)
+	IsCartExist(cartID int) (bool, error)
 }

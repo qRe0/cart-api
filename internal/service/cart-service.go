@@ -69,11 +69,13 @@ func (c *CartService) RemoveItemFromCart(cartIDStr, itemIDStr string) error {
 
 func (c *CartService) GetCart(cartIDStr string) (*models.Cart, error) {
 	cartID, err := strconv.Atoi(cartIDStr)
-	if err != nil {
+	if err != nil || cartID <= 0 {
 		return nil, errs.ErrWrongCartID
 	}
-	if cartID <= 0 {
-		return nil, errs.ErrWrongCartID
+
+	exists, err := c.repo.IsCartExist(cartID)
+	if !exists || err != nil {
+		return nil, errs.ErrCartNotFound
 	}
 
 	return c.repo.GetCart(cartID)
