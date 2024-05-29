@@ -10,7 +10,7 @@ services:
       - POSTGRES_PASSWORD=${DATABASE_PASSWORD}
       - POSTGRES_DB=${DATABASE_NAME}
     ports:
-      - "5432:5432"
+      - ${DB_PORT}:${DB_PORT}
     volumes:
       - ./internal/database/database.sql:/docker-entrypoint-initdb.d/database.sql
     healthcheck:
@@ -27,4 +27,4 @@ services:
     container_name: cart_api
     restart: "no"
     ports:
-      - "3000:3000"
+      - ${API_PORT}:${API_PORT}

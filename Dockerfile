@@ -18,6 +18,6 @@ WORKDIR /root/
 COPY --from=builder /app/start .
 COPY --from=builder /app/.env .
 
-EXPOSE 3000
+EXPOSE ${API_PORT}
 
 CMD ["./start"]
