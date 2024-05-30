@@ -1,6 +1,7 @@
 package configs
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/joho/godotenv"
@@ -28,6 +29,16 @@ func LoadEnv() (*Config, error) {
 	err := godotenv.Load()
 	if err != nil {
 		return nil, errs.ErrLoadEnvVars
+	}
+
+	requiredEnvs := []string{
+		"DB_HOST", "DB_USER", "DB_PASSWORD", "DB_NAME", "DB_PORT", "API_PORT",
+	}
+
+	for _, env := range requiredEnvs {
+		if os.Getenv(env) == "" {
+			return nil, fmt.Errorf("environment variable `%s` is not set or is empty", env)
+		}
 	}
 
 	config := Config{
