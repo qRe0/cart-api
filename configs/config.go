@@ -7,13 +7,21 @@ import (
 	errs "github.com/qRe0/innowise-cart-api/internal/errors"
 )
 
-type Config struct {
+type APIConfig struct {
+	APIPort string
+}
+
+type DBConfig struct {
 	DatabaseHost     string
 	DatabaseUser     string
 	DatabasePassword string
 	DatabaseName     string
-	APIPort          string
 	DBPort           string
+}
+
+type Config struct {
+	API APIConfig
+	DB  DBConfig
 }
 
 func LoadEnv() (*Config, error) {
@@ -23,12 +31,16 @@ func LoadEnv() (*Config, error) {
 	}
 
 	config := Config{
-		DatabaseHost:     os.Getenv("DATABASE_HOST"),
-		DatabaseUser:     os.Getenv("DATABASE_USER"),
-		DatabasePassword: os.Getenv("DATABASE_PASSWORD"),
-		DatabaseName:     os.Getenv("DATABASE_NAME"),
-		APIPort:          os.Getenv("API_PORT"),
-		DBPort:           os.Getenv("DB_PORT"),
+		API: APIConfig{
+			APIPort: os.Getenv("API_PORT"),
+		},
+		DB: DBConfig{
+			DatabaseHost:     os.Getenv("DATABASE_HOST"),
+			DatabaseUser:     os.Getenv("DATABASE_USER"),
+			DatabasePassword: os.Getenv("DATABASE_PASSWORD"),
+			DatabaseName:     os.Getenv("DATABASE_NAME"),
+			DBPort:           os.Getenv("DB_PORT"),
+		},
 	}
 
 	return &config, nil

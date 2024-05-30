@@ -33,7 +33,7 @@ func NewCartRepository(db *sqlx.DB) *CartRepository {
 	}
 }
 
-func Init(cfg *configs.Config) (*sqlx.DB, error) {
+func Init(cfg configs.DBConfig) (*sqlx.DB, error) {
 	connStr := "user=" + cfg.DatabaseUser +
 		" password=" + cfg.DatabasePassword +
 		" dbname=" + cfg.DatabaseName +

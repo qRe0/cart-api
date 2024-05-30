@@ -19,7 +19,7 @@ func Run() {
 		log.Fatalln(err)
 	}
 
-	db, err := repository.Init(cfg)
+	db, err := repository.Init(cfg.DB)
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -48,7 +48,7 @@ func Run() {
 		}
 	})
 
-	port := fmt.Sprintf(":%s", cfg.APIPort)
+	port := fmt.Sprintf(":%s", cfg.API.APIPort)
 
 	log.Printf("Server is running on port %s", port)
 	log.Fatalln(http.ListenAndServe(port, nil))
