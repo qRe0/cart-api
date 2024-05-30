@@ -25,7 +25,11 @@ func Run() {
 		log.Fatalln(err)
 	}
 
-	err = migrations.MigrationUp(db)
+	m, err := migrations.NewMigrator(db)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	err = m.Up()
 	if err != nil {
 		log.Fatalln(err)
 	}
