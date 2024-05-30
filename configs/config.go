@@ -15,7 +15,7 @@ type DBConfig struct {
 	Host     string
 	User     string
 	Password string
-	Name     string
+	DBName   string
 	Port     string
 }
 
@@ -38,7 +38,7 @@ func LoadEnv() (*Config, error) {
 			Host:     os.Getenv("DB_HOST"),
 			User:     os.Getenv("DB_USER"),
 			Password: os.Getenv("DB_PASSWORD"),
-			Name:     os.Getenv("DB_NAME"),
+			DBName:   os.Getenv("DB_NAME"),
 			Port:     os.Getenv("DB_PORT"),
 		},
 	}
