@@ -3,11 +3,10 @@ package repository
 import (
 	"fmt"
 	"log"
-	"os"
 
 	"github.com/jmoiron/sqlx"
-	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
+	"github.com/qRe0/innowise-cart-api/configs"
 	"github.com/qRe0/innowise-cart-api/internal/models"
 )
 
@@ -34,16 +33,11 @@ func NewCartRepository(db *sqlx.DB) *CartRepository {
 	}
 }
 
-func Init() (*sqlx.DB, error) {
-	err := godotenv.Load()
-	if err != nil {
-		return nil, fmt.Errorf("failed to load enviromental variables: %w", err)
-	}
-
-	connStr := "user=" + os.Getenv("DATABASE_USER") +
-		" password=" + os.Getenv("DATABASE_PASSWORD") +
-		" dbname=" + os.Getenv("DATABASE_NAME") +
-		" host=" + os.Getenv("DATABASE_HOST") +
+func Init(cfg *configs.Config) (*sqlx.DB, error) {
+	connStr := "user=" + cfg.DatabaseUser +
+		" password=" + cfg.DatabasePassword +
+		" dbname=" + cfg.DatabaseName +
+		" host=" + cfg.DatabaseHost +
 		" sslmode=disable"
 
 	db, err := sqlx.Open("postgres", connStr)

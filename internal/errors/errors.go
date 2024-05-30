@@ -11,4 +11,5 @@ var (
 	ErrEmptyProductName  = errors.New("error empty product name")
 	ErrWrongItemQuantity = errors.New("error wrong item quantity")
 	ErrClosingDB         = errors.New("error closing database")
+	ErrLoadEnvVars       = errors.New("error loading environment variables")
 )

@@ -4,10 +4,9 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"os"
 
 	"github.com/jmoiron/sqlx"
-	"github.com/joho/godotenv"
+	"github.com/qRe0/innowise-cart-api/configs"
 	errs "github.com/qRe0/innowise-cart-api/internal/errors"
 	"github.com/qRe0/innowise-cart-api/internal/handlers"
 	"github.com/qRe0/innowise-cart-api/internal/repository"
@@ -15,7 +14,12 @@ import (
 )
 
 func Run() {
-	db, err := repository.Init()
+	cfg, err := configs.LoadEnv()
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	db, err := repository.Init(cfg)
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -44,12 +48,7 @@ func Run() {
 		}
 	})
 
-	err = godotenv.Load()
-	if err != nil {
-		log.Fatalf("failed to load enviromental variables: %v", err)
-	}
-
-	port := fmt.Sprintf(":%s", os.Getenv("API_PORT"))
+	port := fmt.Sprintf(":%s", cfg.APIPort)
 
 	log.Printf("Server is running on port %s", port)
 	log.Fatalln(http.ListenAndServe(port, nil))
