@@ -35,10 +35,10 @@ func LoadEnv() (*Config, error) {
 			Port: os.Getenv("API_PORT"),
 		},
 		DB: DBConfig{
-			Host:     os.Getenv("DATABASE_HOST"),
-			User:     os.Getenv("DATABASE_USER"),
-			Password: os.Getenv("DATABASE_PASSWORD"),
-			Name:     os.Getenv("DATABASE_NAME"),
+			Host:     os.Getenv("DB_HOST"),
+			User:     os.Getenv("DB_USER"),
+			Password: os.Getenv("DB_PASSWORD"),
+			Name:     os.Getenv("DB_NAME"),
 			Port:     os.Getenv("DB_PORT"),
 		},
 	}
