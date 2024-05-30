@@ -4,7 +4,7 @@ services:
   database:
     image: postgres:latest
     container_name: cart_database
-    restart: "no"
+    restart: unless-stopped
     environment:
       - POSTGRES_USER=${DATABASE_USER}
       - POSTGRES_PASSWORD=${DATABASE_PASSWORD}
@@ -23,7 +23,7 @@ services:
         condition: service_healthy
     build: .
     container_name: cart_api
-    restart: "no"
+    restart: unless-stopped
     ports:
       - ${API_PORT}:${API_PORT}
     environment:
