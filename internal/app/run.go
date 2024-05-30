@@ -9,6 +9,7 @@ import (
 	"github.com/qRe0/innowise-cart-api/configs"
 	errs "github.com/qRe0/innowise-cart-api/internal/errors"
 	"github.com/qRe0/innowise-cart-api/internal/handlers"
+	"github.com/qRe0/innowise-cart-api/internal/migrations"
 	"github.com/qRe0/innowise-cart-api/internal/repository"
 	"github.com/qRe0/innowise-cart-api/internal/service"
 )
@@ -20,6 +21,11 @@ func Run() {
 	}
 
 	db, err := repository.Init(cfg.DB)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	err = migrations.MigrationUp(db)
 	if err != nil {
 		log.Fatalln(err)
 	}

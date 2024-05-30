@@ -14,7 +14,6 @@ CREATE TABLE IF NOT EXISTS "items"
     UNIQUE (cart_id, product),
     CONSTRAINT "items_cart_id_foreign" FOREIGN KEY ("cart_id") REFERENCES "carts" ("id") ON DELETE CASCADE
 );
-
 -- +goose StatementEnd
 
 -- +goose Down
