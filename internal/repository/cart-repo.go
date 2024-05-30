@@ -34,10 +34,10 @@ func NewCartRepository(db *sqlx.DB) *CartRepository {
 }
 
 func Init(cfg configs.DBConfig) (*sqlx.DB, error) {
-	connStr := "user=" + cfg.DatabaseUser +
-		" password=" + cfg.DatabasePassword +
-		" dbname=" + cfg.DatabaseName +
-		" host=" + cfg.DatabaseHost +
+	connStr := "user=" + cfg.User +
+		" password=" + cfg.Password +
+		" dbname=" + cfg.Name +
+		" host=" + cfg.Host +
 		" sslmode=disable"
 
 	db, err := sqlx.Open("postgres", connStr)

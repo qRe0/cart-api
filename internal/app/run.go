@@ -48,7 +48,7 @@ func Run() {
 		}
 	})
 
-	port := fmt.Sprintf(":%s", cfg.API.APIPort)
+	port := fmt.Sprintf(":%s", cfg.API.Port)
 
 	log.Printf("Server is running on port %s", port)
 	log.Fatalln(http.ListenAndServe(port, nil))
