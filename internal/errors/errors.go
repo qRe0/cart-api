@@ -3,7 +3,7 @@ package errors
 import "errors"
 
 var (
-	ErrCreatingCart      = errors.New("error can't create cart")
+	ErrCreateCart        = errors.New("error can't create cart")
 	ErrWrongCartID       = errors.New("error wrong cart id")
 	ErrWrongItemID       = errors.New("error wrong item id")
 	ErrCartNotFound      = errors.New("error cart not found")
