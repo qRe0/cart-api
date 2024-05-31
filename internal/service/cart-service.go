@@ -40,6 +40,11 @@ func (c *CartService) AddItemToCart(cartIDStr string, item models.CartItem) (*mo
 		return nil, errs.ErrWrongItemQuantity
 	}
 
+	cartExists, err := c.repo.IsCartExist(cartID)
+	if !cartExists || err != nil {
+		return nil, errs.ErrCartNotFound
+	}
+
 	item.CartID = cartID
 	result, err := c.repo.AddItemToCart(item)
 	if err != nil {
