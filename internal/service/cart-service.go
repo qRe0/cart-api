@@ -83,10 +83,11 @@ func (c *CartService) GetCart(cartIDStr string) (*models.Cart, error) {
 		return nil, errs.ErrWrongCartID
 	}
 
-	exists, err := c.repo.IsCartExist(cartID)
-	if !exists || err != nil {
+	cart, err := c.repo.GetCart(cartID)
+
+	if len(cart.Items) == 0 {
 		return nil, errs.ErrCartNotFound
 	}
 
-	return c.repo.GetCart(cartID)
+	return cart, nil
 }
