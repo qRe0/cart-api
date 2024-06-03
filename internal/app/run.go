@@ -1,9 +1,15 @@
 package app
 
 import (
+	"context"
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/qRe0/innowise-cart-api/configs"
@@ -59,6 +65,31 @@ func Run() {
 
 	port := fmt.Sprintf(":%s", cfg.API.Port)
 
-	log.Printf("Server is running on port %s", port)
-	log.Fatalln(http.ListenAndServe(port, nil))
+	srv := http.Server{
+		Addr:    port,
+		Handler: http.DefaultServeMux,
+	}
+
+	stop := make(chan os.Signal, 1)
+	signal.Notify(stop, syscall.SIGTERM, syscall.SIGINT)
+
+	go func() {
+		log.Printf("Server is running on port %s", port)
+		err := srv.ListenAndServe()
+		if err != nil && !errors.Is(err, http.ErrServerClosed) {
+			log.Fatalf("Server failed to start: %v", err)
+		}
+	}()
+
+	<-stop
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	err = srv.Shutdown(ctx)
+	if err != nil {
+		log.Fatalf("Server forced to shutdown: %v", err)
+	}
+
+	log.Println("Server gracefully stopped")
 }

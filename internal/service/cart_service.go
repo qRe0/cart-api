@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"database/sql"
 	"errors"
 	"fmt"
@@ -21,11 +22,10 @@ func NewCartService(repo repository.CartRepositoryInterface) *CartService {
 	}
 }
 
-func (c *CartService) CreateCart() (*models.Cart, error) {
-	cart, err := c.repo.CreateCart()
-
+func (c *CartService) CreateCart(ctx context.Context) (*models.Cart, error) {
+	cart, err := c.repo.CreateCart(ctx)
 	if err != nil {
-		return nil, errs.ErrCreateCart
+		return nil, err
 	}
 
 	return cart, nil

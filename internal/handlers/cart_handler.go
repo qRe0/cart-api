@@ -19,7 +19,8 @@ func NewCartHandler(cs service.CartServiceInterface) *CartHandler {
 }
 
 func (h *CartHandler) CreateCart(w http.ResponseWriter, r *http.Request) {
-	cart, err := h.service.CreateCart()
+	ctx := r.Context()
+	cart, err := h.service.CreateCart(ctx)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return

@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"context"
 	"fmt"
 	"log"
 
@@ -54,16 +55,26 @@ func Init(cfg configs.DBConfig) (*sqlx.DB, error) {
 	return db, nil
 }
 
-func (r *CartRepository) CreateCart() (*models.Cart, error) {
-	_, err := r.db.Exec(createCartQuery)
+func (r *CartRepository) CreateCart(ctx context.Context) (*models.Cart, error) {
+	tx, err := r.db.BeginTxx(ctx, nil)
+	if err != nil {
+		return nil, errs.ErrStartTransaction
+	}
+
+	_, err = tx.ExecContext(ctx, createCartQuery)
+	if err != nil {
+		return nil, errs.ErrCreateCart
+	}
+
+	var id int
+	err = tx.QueryRowContext(ctx, maxCartIDQuery).Scan(&id)
 	if err != nil {
 		return nil, err
 	}
 
-	var id int
-	err = r.db.QueryRow(maxCartIDQuery).Scan(&id)
+	err = tx.Commit()
 	if err != nil {
-		return nil, err
+		return nil, errs.ErrCommitTransaction
 	}
 
 	cart := models.Cart{
