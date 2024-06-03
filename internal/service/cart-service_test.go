@@ -62,30 +62,6 @@ func TestCartService_AddItemToCart(t *testing.T) {
 		expectedErr    error
 	}{
 		{
-			name:   "OK",
-			cartID: "1",
-			item: models.CartItem{
-				Product:  "product",
-				Quantity: 1,
-			},
-			setupMock: func() {
-				mockRepo.On("AddItemToCart", mock.Anything).Return(
-					&models.CartItem{
-						Product:  "product",
-						Quantity: 1,
-						CartID:   1,
-					},
-					nil,
-				)
-			},
-			expectedResult: &models.CartItem{
-				Product:  "product",
-				Quantity: 1,
-				CartID:   1,
-			},
-			expectedErr: nil,
-		},
-		{
 			name:   "invalid cart ID",
 			cartID: "0",
 			item: models.CartItem{
@@ -117,6 +93,32 @@ func TestCartService_AddItemToCart(t *testing.T) {
 			setupMock:      func() {},
 			expectedResult: nil,
 			expectedErr:    errs.ErrWrongItemQuantity,
+		},
+		{
+			name:   "cart not found",
+			cartID: "100",
+			item: models.CartItem{
+				Product:  "product",
+				Quantity: 1,
+			},
+			setupMock: func() {
+				mockRepo.On("AddItemToCart", models.CartItem{CartID: 100, Product: "product", Quantity: 1}).Return(&models.CartItem{}, errs.ErrCartNotFound)
+			},
+			expectedResult: nil,
+			expectedErr:    errs.ErrCartNotFound,
+		},
+		{
+			name:   "OK",
+			cartID: "1",
+			item: models.CartItem{
+				Product:  "product",
+				Quantity: 1,
+			},
+			setupMock: func() {
+				mockRepo.On("AddItemToCart", models.CartItem{CartID: 1, Product: "product", Quantity: 1}).Return(&models.CartItem{ID: 1, CartID: 1, Product: "product", Quantity: 1}, nil)
+			},
+			expectedResult: &models.CartItem{ID: 1, CartID: 1, Product: "product", Quantity: 1},
+			expectedErr:    nil,
 		},
 	}
 
@@ -227,9 +229,9 @@ func TestCartService_GetCart(t *testing.T) {
 		},
 		{
 			name:   "cart not found",
-			cartID: "2",
+			cartID: "100",
 			setupMock: func() {
-				mockRepo.On("GetCart", &models.Cart{ID: 2}).Return(&models.Cart{}, errs.ErrCartNotFound)
+				mockRepo.On("GetCart", &models.Cart{ID: 100}).Return(&models.Cart{}, errs.ErrCartNotFound)
 			},
 			expectedResult: nil,
 			expectedErr:    errs.ErrCartNotFound,
