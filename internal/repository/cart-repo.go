@@ -7,6 +7,7 @@ import (
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 	"github.com/qRe0/innowise-cart-api/configs"
+	errs "github.com/qRe0/innowise-cart-api/internal/errors"
 	"github.com/qRe0/innowise-cart-api/internal/models"
 )
 
@@ -20,7 +21,7 @@ const (
     	VALUES ($1, $2, $3)
     	ON CONFLICT (cart_id, product) 
     	DO UPDATE SET quantity = items.quantity + EXCLUDED.quantity RETURNING id`
-	itemCountQuery  = `SELECT COUNT(id) FROM items WHERE id = $1 AND cart_id = $2`
+	itemCountQuery  = `SELECT id FROM items WHERE id = $1 AND cart_id = $2`
 	deleteItemQuery = `DELETE FROM items WHERE id = $1 AND cart_id = $2`
 	selectItemQuery = `SELECT id, cart_id, product, quantity FROM items WHERE cart_id = $1`
 	selectCartQuery = `SELECT id FROM carts WHERE id = $1`
@@ -85,8 +86,20 @@ func (r *CartRepository) AddItemToCart(item models.CartItem) (*models.CartItem, 
 	return &item, nil
 }
 
-func (r *CartRepository) RemoveItemFromCart(cartID, itemID int) error {
-	_, err := r.db.Exec(deleteItemQuery, itemID, cartID)
+func (r *CartRepository) RemoveItemFromCart(item *models.CartItem) error {
+	row := r.db.QueryRow(selectCartQuery, item.CartID)
+	err := row.Scan(&item.CartID)
+	if err != nil {
+		return errs.ErrCartNotFound
+	}
+
+	row = r.db.QueryRow(itemCountQuery, item.ID, item.CartID)
+	err = row.Scan(&item.ID)
+	if err != nil {
+		return errs.ErrItemNotFound
+	}
+
+	_, err = r.db.Exec(deleteItemQuery, item.ID, item.CartID)
 	if err != nil {
 		return err
 	}

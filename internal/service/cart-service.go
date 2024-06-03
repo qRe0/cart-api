@@ -71,6 +71,16 @@ func (c *CartService) RemoveItemFromCart(cartIDStr, itemIDStr string) error {
 		return errs.ErrWrongItemID
 	}
 
+	item := &models.CartItem{
+		ID:     itemID,
+		CartID: cartID,
+	}
+
+	err = c.repo.RemoveItemFromCart(item)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
