@@ -94,6 +94,13 @@ func (r *CartRepository) RemoveItemFromCart(cartID, itemID int) error {
 }
 
 func (r *CartRepository) GetCart(cartID int) (*models.Cart, error) {
+	row := r.db.QueryRow(`SELECT id from carts WHERE id = $1`, cartID)
+	cart := models.Cart{}
+	err := row.Scan(&cart.ID)
+	if err != nil {
+		return nil, err
+	}
+
 	rows, err := r.db.Query(selectItemQuery, cartID)
 	if err != nil {
 		return nil, err
@@ -101,8 +108,6 @@ func (r *CartRepository) GetCart(cartID int) (*models.Cart, error) {
 	defer rows.Close()
 
 	item := models.CartItem{}
-	cart := models.Cart{}
-	cart.ID = cartID
 	for rows.Next() {
 		err = rows.Scan(&item.ID, &item.CartID, &item.Product, &item.Quantity)
 		if err != nil {

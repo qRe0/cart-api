@@ -1,6 +1,7 @@
 package service
 
 import (
+	"database/sql"
 	"errors"
 	"fmt"
 	"strconv"
@@ -79,5 +80,13 @@ func (c *CartService) GetCart(cartIDStr string) (*models.Cart, error) {
 		return nil, errs.ErrWrongCartID
 	}
 
-	return c.repo.GetCart(cartID)
+	cart, err := c.repo.GetCart(cartID)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, errs.ErrCartNotFound
+		}
+		return nil, fmt.Errorf("database error: %w", err)
+	}
+
+	return cart, nil
 }
