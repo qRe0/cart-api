@@ -28,16 +28,6 @@ func (m *MockCartRepository) RemoveItemFromCart(cartID, itemID int) error {
 	panic("implement me")
 }
 
-func (m *MockCartRepository) IsCartExist(cartID int) (bool, error) {
-	//TODO implement me
-	panic("implement me")
-}
-
-func (m *MockCartRepository) IsItemExist(itemID, cartID int) (bool, error) {
-	//TODO implement me
-	panic("implement me")
-}
-
 func (m *MockCartRepository) GetCart(cartID int) (*models.Cart, error) {
 	//TODO implement me
 	panic("implement me")

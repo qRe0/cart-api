@@ -93,26 +93,6 @@ func (r *CartRepository) RemoveItemFromCart(cartID, itemID int) error {
 	return nil
 }
 
-func (r *CartRepository) IsItemExist(itemID, cartID int) (bool, error) {
-	var count int
-	err := r.db.QueryRow(itemCountQuery, itemID, cartID).Scan(&count)
-	if count == 0 {
-		return false, err
-	}
-
-	return true, nil
-}
-
-func (r *CartRepository) IsCartExist(cartID int) (bool, error) {
-	var count int
-	err := r.db.QueryRow(cartCountQuery, cartID).Scan(&count)
-	if count == 0 {
-		return false, err
-	}
-
-	return true, nil
-}
-
 func (r *CartRepository) GetCart(cartID int) (*models.Cart, error) {
 	rows, err := r.db.Query(selectItemQuery, cartID)
 	if err != nil {

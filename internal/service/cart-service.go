@@ -70,16 +70,7 @@ func (c *CartService) RemoveItemFromCart(cartIDStr, itemIDStr string) error {
 		return errs.ErrWrongItemID
 	}
 
-	cartExists, err := c.repo.IsCartExist(cartID)
-	if !cartExists || err != nil {
-		return errs.ErrCartNotFound
-	}
-	itemExists, err := c.repo.IsItemExist(itemID, cartID)
-	if !itemExists || err != nil {
-		return errs.ErrItemNotFound
-	}
-
-	return c.repo.RemoveItemFromCart(cartID, itemID)
+	return nil
 }
 
 func (c *CartService) GetCart(cartIDStr string) (*models.Cart, error) {
@@ -88,11 +79,5 @@ func (c *CartService) GetCart(cartIDStr string) (*models.Cart, error) {
 		return nil, errs.ErrWrongCartID
 	}
 
-	cart, err := c.repo.GetCart(cartID)
-
-	if len(cart.Items) == 0 {
-		return nil, errs.ErrCartNotFound
-	}
-
-	return cart, nil
+	return c.repo.GetCart(cartID)
 }
