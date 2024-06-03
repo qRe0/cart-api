@@ -9,7 +9,8 @@ import (
 )
 
 type APIConfig struct {
-	Port string
+	Port            string
+	ShutdownTimeout string
 }
 
 type DBConfig struct {
@@ -32,7 +33,7 @@ func LoadEnv() (*Config, error) {
 	}
 
 	requiredEnvs := []string{
-		"DB_HOST", "DB_USER", "DB_PASSWORD", "DB_NAME", "DB_PORT", "API_PORT",
+		"DB_HOST", "DB_USER", "DB_PASSWORD", "DB_NAME", "DB_PORT", "API_PORT", "SHUTDOWN_TIMEOUT",
 	}
 
 	for _, env := range requiredEnvs {
@@ -43,7 +44,8 @@ func LoadEnv() (*Config, error) {
 
 	config := Config{
 		API: APIConfig{
-			Port: os.Getenv("API_PORT"),
+			Port:            os.Getenv("API_PORT"),
+			ShutdownTimeout: os.Getenv("SHUTDOWN_TIMEOUT"),
 		},
 		DB: DBConfig{
 			Host:     os.Getenv("DB_HOST"),

@@ -83,7 +83,15 @@ func Run() {
 
 	<-stop
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	log.Println("Server is shutting down...")
+
+	envTimeout := fmt.Sprintf("%sms", cfg.API.ShutdownTimeout)
+	timeout, err := time.ParseDuration(envTimeout)
+	if err != nil {
+		log.Fatalf("Failed to parse shutdown timeout: %v", err)
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 
 	err = srv.Shutdown(ctx)
