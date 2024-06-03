@@ -28,9 +28,9 @@ func (m *MockCartRepository) RemoveItemFromCart(cartID, itemID int) error {
 	panic("implement me")
 }
 
-func (m *MockCartRepository) GetCart(cartID int) (*models.Cart, error) {
-	//TODO implement me
-	panic("implement me")
+func (m *MockCartRepository) GetCart(cart *models.Cart) (*models.Cart, error) {
+	args := m.Called(cart)
+	return args.Get(0).(*models.Cart), args.Error(1)
 }
 
 func TestCartService_CreateCart(t *testing.T) {
@@ -125,6 +125,84 @@ func TestCartService_AddItemToCart(t *testing.T) {
 			testCase.setupMock()
 
 			result, err := service.AddItemToCart(testCase.cartID, testCase.item)
+			if testCase.expectedErr != nil {
+				assert.ErrorIs(t, err, testCase.expectedErr)
+			} else {
+				assert.NoError(t, err)
+			}
+			assert.Equal(t, testCase.expectedResult, result)
+
+			mockRepo.AssertExpectations(t)
+		})
+	}
+}
+
+func TestCartService_GetCart(t *testing.T) {
+	mockRepo := new(MockCartRepository)
+	service := NewCartService(mockRepo)
+
+	testTable := []struct {
+		name           string
+		cartID         string
+		setupMock      func()
+		expectedResult *models.Cart
+		expectedErr    error
+	}{
+		{
+			name:           "invalid cart ID",
+			cartID:         "0",
+			setupMock:      func() {},
+			expectedResult: nil,
+			expectedErr:    errs.ErrWrongCartID,
+		},
+		{
+			name:   "cart not found",
+			cartID: "2",
+			setupMock: func() {
+				mockRepo.On("GetCart", &models.Cart{ID: 2}).Return(&models.Cart{}, errs.ErrCartNotFound)
+			},
+			expectedResult: nil,
+			expectedErr:    errs.ErrCartNotFound,
+		},
+		{
+			name:   "OK",
+			cartID: "1",
+			setupMock: func() {
+				mockRepo.On("GetCart", mock.Anything).Return(
+					&models.Cart{
+						ID: 1,
+						Items: []models.CartItem{
+							{
+								ID:       1,
+								CartID:   1,
+								Product:  "product",
+								Quantity: 1,
+							},
+						},
+					},
+					nil,
+				)
+			},
+			expectedResult: &models.Cart{
+				ID: 1,
+				Items: []models.CartItem{
+					{
+						ID:       1,
+						CartID:   1,
+						Product:  "product",
+						Quantity: 1,
+					},
+				},
+			},
+			expectedErr: nil,
+		},
+	}
+
+	for _, testCase := range testTable {
+		t.Run(testCase.name, func(t *testing.T) {
+			testCase.setupMock()
+
+			result, err := service.GetCart(testCase.cartID)
 			if testCase.expectedErr != nil {
 				assert.ErrorIs(t, err, testCase.expectedErr)
 			} else {
