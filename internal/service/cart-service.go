@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/lib/pq"
 	errs "github.com/qRe0/innowise-cart-api/internal/errors"
 	"github.com/qRe0/innowise-cart-api/internal/models"
 	"github.com/qRe0/innowise-cart-api/internal/repository"
@@ -47,14 +46,6 @@ func (c *CartService) AddItemToCart(cartIDStr string, item models.CartItem) (*mo
 	item.CartID = cartID
 	result, err := c.repo.AddItemToCart(item)
 	if err != nil {
-		var pqErr *pq.Error
-		if errors.As(err, &pqErr) {
-			if pqErr.Code == "23503" {
-				return nil, errs.ErrCartNotFound
-			}
-
-			return nil, fmt.Errorf("database error: %s", pqErr.Message)
-		}
 		return nil, err
 	}
 

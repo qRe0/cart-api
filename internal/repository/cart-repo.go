@@ -75,8 +75,14 @@ func (r *CartRepository) CreateCart() (*models.Cart, error) {
 }
 
 func (r *CartRepository) AddItemToCart(item models.CartItem) (*models.CartItem, error) {
+	row := r.db.QueryRow(checkCartQuery, item.CartID)
+	err := row.Scan(&item.CartID)
+	if err != nil {
+		return nil, errs.ErrCartNotFound
+	}
+
 	var id int
-	err := r.db.QueryRow(insertItemQuery, item.CartID, item.Product, item.Quantity).Scan(&id)
+	err = r.db.QueryRow(insertItemQuery, item.CartID, item.Product, item.Quantity).Scan(&id)
 	if err != nil {
 		return nil, err
 	}
