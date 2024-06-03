@@ -23,6 +23,7 @@ const (
 	itemCountQuery  = `SELECT COUNT(id) FROM items WHERE id = $1 AND cart_id = $2`
 	deleteItemQuery = `DELETE FROM items WHERE id = $1 AND cart_id = $2`
 	selectItemQuery = `SELECT id, cart_id, product, quantity FROM items WHERE cart_id = $1`
+	selectCartQuery = `SELECT id FROM carts WHERE id = $1`
 )
 
 type CartRepository struct {
@@ -93,15 +94,14 @@ func (r *CartRepository) RemoveItemFromCart(cartID, itemID int) error {
 	return nil
 }
 
-func (r *CartRepository) GetCart(cartID int) (*models.Cart, error) {
-	row := r.db.QueryRow(`SELECT id from carts WHERE id = $1`, cartID)
-	cart := models.Cart{}
+func (r *CartRepository) GetCart(cart *models.Cart) (*models.Cart, error) {
+	row := r.db.QueryRow(selectCartQuery, cart.ID)
 	err := row.Scan(&cart.ID)
 	if err != nil {
 		return nil, err
 	}
 
-	rows, err := r.db.Query(selectItemQuery, cartID)
+	rows, err := r.db.Query(selectItemQuery, cart.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -116,5 +116,5 @@ func (r *CartRepository) GetCart(cartID int) (*models.Cart, error) {
 		cart.Items = append(cart.Items, item)
 	}
 
-	return &cart, nil
+	return cart, nil
 }

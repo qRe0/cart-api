@@ -80,7 +80,11 @@ func (c *CartService) GetCart(cartIDStr string) (*models.Cart, error) {
 		return nil, errs.ErrWrongCartID
 	}
 
-	cart, err := c.repo.GetCart(cartID)
+	cart := &models.Cart{
+		ID: cartID,
+	}
+
+	resCart, err := c.repo.GetCart(cart)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, errs.ErrCartNotFound
@@ -88,5 +92,5 @@ func (c *CartService) GetCart(cartIDStr string) (*models.Cart, error) {
 		return nil, fmt.Errorf("database error: %w", err)
 	}
 
-	return cart, nil
+	return resCart, nil
 }

@@ -6,5 +6,5 @@ type CartRepositoryInterface interface {
 	CreateCart() (*models.Cart, error)
 	AddItemToCart(item models.CartItem) (*models.CartItem, error)
 	RemoveItemFromCart(cartID, itemID int) error
-	GetCart(cartID int) (*models.Cart, error)
+	GetCart(cart *models.Cart) (*models.Cart, error)
 }
