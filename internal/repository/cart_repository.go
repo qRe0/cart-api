@@ -135,15 +135,22 @@ func (r *CartRepository) RemoveItemFromCart(item *models.CartItem) error {
 	return nil
 }
 
-func (r *CartRepository) GetCart(cart *models.Cart) (*models.Cart, error) {
-	row := r.db.QueryRow(checkCartQuery, cart.ID)
-	err := row.Scan(&cart.ID)
+func (r *CartRepository) GetCart(ctx context.Context, cart *models.Cart) (*models.Cart, error) {
+	tx, err := r.db.BeginTxx(ctx, nil)
 	if err != nil {
-		return nil, err
+		return nil, errs.ErrStartTransaction
 	}
 
-	rows, err := r.db.Query(selectItemQuery, cart.ID)
+	row := tx.QueryRowContext(ctx, checkCartQuery, cart.ID)
+	err = row.Scan(&cart.ID)
 	if err != nil {
+		tx.Rollback()
+		return nil, errs.ErrCartNotFound
+	}
+
+	rows, err := tx.QueryContext(ctx, selectItemQuery, cart.ID)
+	if err != nil {
+		tx.Rollback()
 		return nil, err
 	}
 	defer rows.Close()
@@ -155,6 +162,11 @@ func (r *CartRepository) GetCart(cart *models.Cart) (*models.Cart, error) {
 			return nil, err
 		}
 		cart.Items = append(cart.Items, item)
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return nil, errs.ErrCommitTransaction
 	}
 
 	return cart, nil

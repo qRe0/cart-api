@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"database/sql"
 	"errors"
 	"fmt"
 	"strconv"
@@ -76,7 +75,7 @@ func (c *CartService) RemoveItemFromCart(cartIDStr, itemIDStr string) error {
 	return nil
 }
 
-func (c *CartService) GetCart(cartIDStr string) (*models.Cart, error) {
+func (c *CartService) GetCart(ctx context.Context, cartIDStr string) (*models.Cart, error) {
 	cartID, err := strconv.Atoi(cartIDStr)
 	if err != nil || cartID <= 0 {
 		return nil, errs.ErrWrongCartID
@@ -86,12 +85,18 @@ func (c *CartService) GetCart(cartIDStr string) (*models.Cart, error) {
 		ID: cartID,
 	}
 
-	resCart, err := c.repo.GetCart(cart)
+	resCart, err := c.repo.GetCart(ctx, cart)
 	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
+		switch {
+		case errors.Is(err, errs.ErrCartNotFound):
 			return nil, errs.ErrCartNotFound
+		case errors.Is(err, errs.ErrStartTransaction):
+			return nil, errs.ErrStartTransaction
+		case errors.Is(err, errs.ErrCommitTransaction):
+			return nil, errs.ErrCommitTransaction
+		default:
+			return nil, fmt.Errorf("database error: %w", err)
 		}
-		return nil, fmt.Errorf("database error: %w", err)
 	}
 
 	return resCart, nil

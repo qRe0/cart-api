@@ -10,5 +10,5 @@ type CartRepositoryInterface interface {
 	CreateCart(ctx context.Context) (*models.Cart, error)
 	AddItemToCart(ctx context.Context, item models.CartItem) (*models.CartItem, error)
 	RemoveItemFromCart(item *models.CartItem) error
-	GetCart(cart *models.Cart) (*models.Cart, error)
+	GetCart(ctx context.Context, cart *models.Cart) (*models.Cart, error)
 }
