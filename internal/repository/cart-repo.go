@@ -16,7 +16,6 @@ const (
 
 	createCartQuery = `INSERT INTO carts DEFAULT VALUES`
 	maxCartIDQuery  = `SELECT MAX(id) FROM carts`
-	cartCountQuery  = `SELECT COUNT(id) FROM carts WHERE id = $1`
 	insertItemQuery = `INSERT INTO items (cart_id, product, quantity) 
     	VALUES ($1, $2, $3)
     	ON CONFLICT (cart_id, product) 
