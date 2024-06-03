@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
+	errs "github.com/qRe0/innowise-cart-api/internal/errors"
 	"github.com/qRe0/innowise-cart-api/internal/service"
 )
 
@@ -28,7 +29,7 @@ func (h *CartHandler) CreateCart(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusCreated)
 	err = json.NewEncoder(w).Encode(cart)
 	if err != nil {
-		http.Error(w, "error encoding", http.StatusBadRequest)
+		http.Error(w, errs.ErrEncoding.Error(), http.StatusBadRequest)
 		return
 	}
 }
@@ -46,7 +47,7 @@ func (h *CartHandler) GetCart(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	err = json.NewEncoder(w).Encode(cart)
 	if err != nil {
-		http.Error(w, "error encoding", http.StatusBadRequest)
+		http.Error(w, errs.ErrEncoding.Error(), http.StatusBadRequest)
 		return
 	}
 }

@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"regexp"
 
+	errs "github.com/qRe0/innowise-cart-api/internal/errors"
 	"github.com/qRe0/innowise-cart-api/internal/models"
 	"github.com/qRe0/innowise-cart-api/internal/service"
 )
@@ -40,7 +41,7 @@ func (h *ItemHandler) AddItemToCart(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	err = json.NewEncoder(w).Encode(item)
 	if err != nil {
-		http.Error(w, "error encoding", http.StatusBadRequest)
+		http.Error(w, errs.ErrEncoding.Error(), http.StatusBadRequest)
 		return
 	}
 }
@@ -68,7 +69,7 @@ func (h *ItemHandler) RemoveItemFromCart(w http.ResponseWriter, r *http.Request)
 	w.WriteHeader(http.StatusOK)
 	_, err = w.Write([]byte("{}"))
 	if err != nil {
-		http.Error(w, "error encoding", http.StatusBadRequest)
+		http.Error(w, errs.ErrEncoding.Error(), http.StatusBadRequest)
 		return
 	}
 }
