@@ -51,7 +51,7 @@ func (c *CartService) AddItemToCart(ctx context.Context, cartIDStr string, item 
 	return result, nil
 }
 
-func (c *CartService) RemoveItemFromCart(cartIDStr, itemIDStr string) error {
+func (c *CartService) RemoveItemFromCart(ctx context.Context, cartIDStr, itemIDStr string) error {
 	cartID, err := strconv.Atoi(cartIDStr)
 	if err != nil || cartID <= 0 {
 		return errs.ErrWrongCartID
@@ -67,7 +67,7 @@ func (c *CartService) RemoveItemFromCart(cartIDStr, itemIDStr string) error {
 		CartID: cartID,
 	}
 
-	err = c.repo.RemoveItemFromCart(item)
+	err = c.repo.RemoveItemFromCart(ctx, item)
 	if err != nil {
 		return err
 	}
