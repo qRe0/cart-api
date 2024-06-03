@@ -37,8 +37,7 @@ func Run() {
 	defer func(db *sqlx.DB) {
 		err := db.Close()
 		if err != nil {
-			e := errs.ErrClosingDB
-			log.Fatalln(e)
+			log.Fatalln(errs.ErrClosingDB)
 		}
 	}(db)
 
