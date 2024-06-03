@@ -63,12 +63,14 @@ func (r *CartRepository) CreateCart(ctx context.Context) (*models.Cart, error) {
 
 	_, err = tx.ExecContext(ctx, createCartQuery)
 	if err != nil {
+		tx.Rollback()
 		return nil, errs.ErrCreateCart
 	}
 
 	var id int
 	err = tx.QueryRowContext(ctx, maxCartIDQuery).Scan(&id)
 	if err != nil {
+		tx.Rollback()
 		return nil, err
 	}
 
