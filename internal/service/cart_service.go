@@ -2,8 +2,6 @@ package service
 
 import (
 	"context"
-	"errors"
-	"fmt"
 	"strconv"
 
 	errs "github.com/qRe0/innowise-cart-api/internal/errors"
@@ -87,16 +85,7 @@ func (c *CartService) GetCart(ctx context.Context, cartIDStr string) (*models.Ca
 
 	resCart, err := c.repo.GetCart(ctx, cart)
 	if err != nil {
-		switch {
-		case errors.Is(err, errs.ErrCartNotFound):
-			return nil, errs.ErrCartNotFound
-		case errors.Is(err, errs.ErrStartTransaction):
-			return nil, errs.ErrStartTransaction
-		case errors.Is(err, errs.ErrCommitTransaction):
-			return nil, errs.ErrCommitTransaction
-		default:
-			return nil, fmt.Errorf("database error: %w", err)
-		}
+		return nil, err
 	}
 
 	return resCart, nil
