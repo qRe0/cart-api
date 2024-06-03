@@ -85,17 +85,29 @@ func (r *CartRepository) CreateCart(ctx context.Context) (*models.Cart, error) {
 	return &cart, nil
 }
 
-func (r *CartRepository) AddItemToCart(item models.CartItem) (*models.CartItem, error) {
-	row := r.db.QueryRow(checkCartQuery, item.CartID)
-	err := row.Scan(&item.CartID)
+func (r *CartRepository) AddItemToCart(ctx context.Context, item models.CartItem) (*models.CartItem, error) {
+	tx, err := r.db.BeginTxx(ctx, nil)
 	if err != nil {
+		return nil, errs.ErrStartTransaction
+	}
+
+	row := tx.QueryRowContext(ctx, checkCartQuery, item.CartID)
+	err = row.Scan(&item.CartID)
+	if err != nil {
+		tx.Rollback()
 		return nil, errs.ErrCartNotFound
 	}
 
 	var id int
-	err = r.db.QueryRow(insertItemQuery, item.CartID, item.Product, item.Quantity).Scan(&id)
+	err = tx.QueryRowContext(ctx, insertItemQuery, item.CartID, item.Product, item.Quantity).Scan(&id)
 	if err != nil {
+		tx.Rollback()
 		return nil, err
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return nil, errs.ErrCommitTransaction
 	}
 
 	item.ID = id

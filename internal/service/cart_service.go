@@ -31,7 +31,7 @@ func (c *CartService) CreateCart(ctx context.Context) (*models.Cart, error) {
 	return cart, nil
 }
 
-func (c *CartService) AddItemToCart(cartIDStr string, item models.CartItem) (*models.CartItem, error) {
+func (c *CartService) AddItemToCart(ctx context.Context, cartIDStr string, item models.CartItem) (*models.CartItem, error) {
 	cartID, err := strconv.Atoi(cartIDStr)
 	if err != nil || cartID <= 0 {
 		return nil, errs.ErrWrongCartID
@@ -44,7 +44,7 @@ func (c *CartService) AddItemToCart(cartIDStr string, item models.CartItem) (*mo
 	}
 
 	item.CartID = cartID
-	result, err := c.repo.AddItemToCart(item)
+	result, err := c.repo.AddItemToCart(ctx, item)
 	if err != nil {
 		return nil, err
 	}
