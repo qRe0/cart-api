@@ -13,4 +13,5 @@ var (
 	ErrClosingDB         = errors.New("error closing database")
 	ErrLoadEnvVars       = errors.New("error loading environment variables")
 	ErrEncoding          = errors.New("error encoding")
+	ErrDecodingReqBody   = errors.New("error decoding request body")
 )
