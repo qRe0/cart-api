@@ -51,10 +51,11 @@ func (c *CartService) AddItemToCart(cartIDStr string, item models.CartItem) (*mo
 		if errors.As(err, &pqErr) {
 			if pqErr.Code == "23503" {
 				return nil, errs.ErrCartNotFound
-			} else {
-				return nil, fmt.Errorf("database error: %s", pqErr.Message)
 			}
+
+			return nil, fmt.Errorf("database error: %s", pqErr.Message)
 		}
+		return nil, err
 	}
 
 	return result, nil
