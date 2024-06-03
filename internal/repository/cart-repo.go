@@ -21,10 +21,10 @@ const (
     	VALUES ($1, $2, $3)
     	ON CONFLICT (cart_id, product) 
     	DO UPDATE SET quantity = items.quantity + EXCLUDED.quantity RETURNING id`
-	itemCountQuery  = `SELECT id FROM items WHERE id = $1 AND cart_id = $2`
+	checkItemQuery  = `SELECT id FROM items WHERE id = $1 AND cart_id = $2`
 	deleteItemQuery = `DELETE FROM items WHERE id = $1 AND cart_id = $2`
 	selectItemQuery = `SELECT id, cart_id, product, quantity FROM items WHERE cart_id = $1`
-	selectCartQuery = `SELECT id FROM carts WHERE id = $1`
+	checkCartQuery  = `SELECT id FROM carts WHERE id = $1`
 )
 
 type CartRepository struct {
@@ -87,13 +87,13 @@ func (r *CartRepository) AddItemToCart(item models.CartItem) (*models.CartItem, 
 }
 
 func (r *CartRepository) RemoveItemFromCart(item *models.CartItem) error {
-	row := r.db.QueryRow(selectCartQuery, item.CartID)
+	row := r.db.QueryRow(checkCartQuery, item.CartID)
 	err := row.Scan(&item.CartID)
 	if err != nil {
 		return errs.ErrCartNotFound
 	}
 
-	row = r.db.QueryRow(itemCountQuery, item.ID, item.CartID)
+	row = r.db.QueryRow(checkItemQuery, item.ID, item.CartID)
 	err = row.Scan(&item.ID)
 	if err != nil {
 		return errs.ErrItemNotFound
@@ -108,7 +108,7 @@ func (r *CartRepository) RemoveItemFromCart(item *models.CartItem) error {
 }
 
 func (r *CartRepository) GetCart(cart *models.Cart) (*models.Cart, error) {
-	row := r.db.QueryRow(selectCartQuery, cart.ID)
+	row := r.db.QueryRow(checkCartQuery, cart.ID)
 	err := row.Scan(&cart.ID)
 	if err != nil {
 		return nil, err
