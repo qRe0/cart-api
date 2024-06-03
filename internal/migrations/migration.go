@@ -12,7 +12,10 @@ import (
 var (
 	//go:embed *.sql
 	embedMigrations embed.FS
-	migrationDir    = "."
+)
+
+const (
+	migrationDir = "."
 )
 
 type Migration struct {
