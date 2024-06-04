@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"context"
 	"fmt"
 	"log"
 
@@ -54,16 +55,28 @@ func Init(cfg configs.DBConfig) (*sqlx.DB, error) {
 	return db, nil
 }
 
-func (r *CartRepository) CreateCart() (*models.Cart, error) {
-	_, err := r.db.Exec(createCartQuery)
+func (r *CartRepository) CreateCart(ctx context.Context) (*models.Cart, error) {
+	tx, err := r.db.BeginTxx(ctx, nil)
 	if err != nil {
-		return nil, err
+		return nil, errs.ErrStartTransaction
+	}
+
+	_, err = tx.ExecContext(ctx, createCartQuery)
+	if err != nil {
+		tx.Rollback()
+		return nil, errs.ErrCreateCart
 	}
 
 	var id int
-	err = r.db.QueryRow(maxCartIDQuery).Scan(&id)
+	err = tx.QueryRowxContext(ctx, maxCartIDQuery).Scan(&id)
 	if err != nil {
+		tx.Rollback()
 		return nil, err
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return nil, errs.ErrCommitTransaction
 	}
 
 	cart := models.Cart{
@@ -74,52 +87,77 @@ func (r *CartRepository) CreateCart() (*models.Cart, error) {
 	return &cart, nil
 }
 
-func (r *CartRepository) AddItemToCart(item models.CartItem) (*models.CartItem, error) {
-	row := r.db.QueryRow(checkCartQuery, item.CartID)
-	err := row.Scan(&item.CartID)
+func (r *CartRepository) AddItemToCart(ctx context.Context, item models.CartItem) (*models.CartItem, error) {
+	tx, err := r.db.BeginTxx(ctx, nil)
 	if err != nil {
+		return nil, errs.ErrStartTransaction
+	}
+
+	row := tx.QueryRowxContext(ctx, checkCartQuery, item.CartID)
+	err = row.Scan(&item.CartID)
+	if err != nil {
+		tx.Rollback()
 		return nil, errs.ErrCartNotFound
 	}
 
 	var id int
-	err = r.db.QueryRow(insertItemQuery, item.CartID, item.Product, item.Quantity).Scan(&id)
+	err = tx.QueryRowxContext(ctx, insertItemQuery, item.CartID, item.Product, item.Quantity).Scan(&id)
 	if err != nil {
+		tx.Rollback()
 		return nil, err
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return nil, errs.ErrCommitTransaction
 	}
 
 	item.ID = id
 	return &item, nil
 }
 
-func (r *CartRepository) RemoveItemFromCart(item *models.CartItem) error {
-	row := r.db.QueryRow(checkCartQuery, item.CartID)
-	err := row.Scan(&item.CartID)
+func (r *CartRepository) RemoveItemFromCart(ctx context.Context, item *models.CartItem) error {
+	tx, err := r.db.BeginTxx(ctx, nil)
 	if err != nil {
+		return errs.ErrStartTransaction
+	}
+
+	row := tx.QueryRowxContext(ctx, checkCartQuery, item.CartID)
+	err = row.Scan(&item.CartID)
+	if err != nil {
+		tx.Rollback()
 		return errs.ErrCartNotFound
 	}
 
-	row = r.db.QueryRow(checkItemQuery, item.ID, item.CartID)
+	row = tx.QueryRowxContext(ctx, checkItemQuery, item.ID, item.CartID)
 	err = row.Scan(&item.ID)
 	if err != nil {
+		tx.Rollback()
 		return errs.ErrItemNotFound
 	}
 
-	_, err = r.db.Exec(deleteItemQuery, item.ID, item.CartID)
+	_, err = tx.ExecContext(ctx, deleteItemQuery, item.ID, item.CartID)
 	if err != nil {
+		tx.Rollback()
 		return err
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return errs.ErrCommitTransaction
 	}
 
 	return nil
 }
 
-func (r *CartRepository) GetCart(cart *models.Cart) (*models.Cart, error) {
-	row := r.db.QueryRow(checkCartQuery, cart.ID)
+func (r *CartRepository) GetCart(ctx context.Context, cart *models.Cart) (*models.Cart, error) {
+	row := r.db.QueryRowxContext(ctx, checkCartQuery, cart.ID)
 	err := row.Scan(&cart.ID)
 	if err != nil {
-		return nil, err
+		return nil, errs.ErrCartNotFound
 	}
 
-	rows, err := r.db.Query(selectItemQuery, cart.ID)
+	rows, err := r.db.QueryxContext(ctx, selectItemQuery, cart.ID)
 	if err != nil {
 		return nil, err
 	}

@@ -1,10 +1,14 @@
 package repository
 
-import "github.com/qRe0/innowise-cart-api/internal/models"
+import (
+	"context"
+
+	"github.com/qRe0/innowise-cart-api/internal/models"
+)
 
 type CartRepositoryInterface interface {
-	CreateCart() (*models.Cart, error)
-	AddItemToCart(item models.CartItem) (*models.CartItem, error)
-	RemoveItemFromCart(item *models.CartItem) error
-	GetCart(cart *models.Cart) (*models.Cart, error)
+	CreateCart(ctx context.Context) (*models.Cart, error)
+	AddItemToCart(ctx context.Context, item models.CartItem) (*models.CartItem, error)
+	RemoveItemFromCart(ctx context.Context, item *models.CartItem) error
+	GetCart(ctx context.Context, cart *models.Cart) (*models.Cart, error)
 }

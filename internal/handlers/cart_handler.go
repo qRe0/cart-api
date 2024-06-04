@@ -19,7 +19,8 @@ func NewCartHandler(cs service.CartServiceInterface) *CartHandler {
 }
 
 func (h *CartHandler) CreateCart(w http.ResponseWriter, r *http.Request) {
-	cart, err := h.service.CreateCart()
+	ctx := r.Context()
+	cart, err := h.service.CreateCart(ctx)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
@@ -35,9 +36,10 @@ func (h *CartHandler) CreateCart(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *CartHandler) GetCart(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
 	cartIDStr := r.URL.Path[len("/carts/"):]
 
-	cart, err := h.service.GetCart(cartIDStr)
+	cart, err := h.service.GetCart(ctx, cartIDStr)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
