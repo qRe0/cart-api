@@ -68,7 +68,7 @@ func (r *CartRepository) CreateCart(ctx context.Context) (*models.Cart, error) {
 	}
 
 	var id int
-	err = tx.QueryRowContext(ctx, maxCartIDQuery).Scan(&id)
+	err = tx.QueryRowxContext(ctx, maxCartIDQuery).Scan(&id)
 	if err != nil {
 		tx.Rollback()
 		return nil, err
@@ -93,7 +93,7 @@ func (r *CartRepository) AddItemToCart(ctx context.Context, item models.CartItem
 		return nil, errs.ErrStartTransaction
 	}
 
-	row := tx.QueryRowContext(ctx, checkCartQuery, item.CartID)
+	row := tx.QueryRowxContext(ctx, checkCartQuery, item.CartID)
 	err = row.Scan(&item.CartID)
 	if err != nil {
 		tx.Rollback()
@@ -101,7 +101,7 @@ func (r *CartRepository) AddItemToCart(ctx context.Context, item models.CartItem
 	}
 
 	var id int
-	err = tx.QueryRowContext(ctx, insertItemQuery, item.CartID, item.Product, item.Quantity).Scan(&id)
+	err = tx.QueryRowxContext(ctx, insertItemQuery, item.CartID, item.Product, item.Quantity).Scan(&id)
 	if err != nil {
 		tx.Rollback()
 		return nil, err
@@ -122,14 +122,14 @@ func (r *CartRepository) RemoveItemFromCart(ctx context.Context, item *models.Ca
 		return errs.ErrStartTransaction
 	}
 
-	row := tx.QueryRowContext(ctx, checkCartQuery, item.CartID)
+	row := tx.QueryRowxContext(ctx, checkCartQuery, item.CartID)
 	err = row.Scan(&item.CartID)
 	if err != nil {
 		tx.Rollback()
 		return errs.ErrCartNotFound
 	}
 
-	row = tx.QueryRowContext(ctx, checkItemQuery, item.ID, item.CartID)
+	row = tx.QueryRowxContext(ctx, checkItemQuery, item.ID, item.CartID)
 	err = row.Scan(&item.ID)
 	if err != nil {
 		tx.Rollback()
@@ -151,13 +151,13 @@ func (r *CartRepository) RemoveItemFromCart(ctx context.Context, item *models.Ca
 }
 
 func (r *CartRepository) GetCart(ctx context.Context, cart *models.Cart) (*models.Cart, error) {
-	row := r.db.QueryRowContext(ctx, checkCartQuery, cart.ID)
+	row := r.db.QueryRowxContext(ctx, checkCartQuery, cart.ID)
 	err := row.Scan(&cart.ID)
 	if err != nil {
 		return nil, errs.ErrCartNotFound
 	}
 
-	rows, err := r.db.QueryContext(ctx, selectItemQuery, cart.ID)
+	rows, err := r.db.QueryxContext(ctx, selectItemQuery, cart.ID)
 	if err != nil {
 		return nil, err
 	}
