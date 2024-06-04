@@ -66,8 +66,7 @@ func Run() {
 	port := fmt.Sprintf(":%s", cfg.API.Port)
 
 	srv := http.Server{
-		Addr:    port,
-		Handler: http.DefaultServeMux,
+		Addr: port,
 	}
 
 	stop := make(chan os.Signal, 1)
