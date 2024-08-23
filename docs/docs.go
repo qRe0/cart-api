@@ -44,9 +44,9 @@ const docTemplate = `{
                 "summary": "Creates shopping cart",
                 "responses": {
                     "201": {
-                        "description": "Created",
+                        "description": "Cart created successfully",
                         "schema": {
-                            "$ref": "#/definitions/models.Cart"
+                            "$ref": "#/definitions/models.CreateCartResponse"
                         }
                     },
                     "401": {
@@ -97,7 +97,7 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "Item added to cart successfully",
                         "schema": {
                             "$ref": "#/definitions/models.CartItem"
                         }
@@ -147,9 +147,9 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "Cart retrieved successfully",
                         "schema": {
-                            "$ref": "#/definitions/models.Cart"
+                            "$ref": "#/definitions/models.GetCartResponse"
                         }
                     },
                     "400": {
@@ -206,7 +206,7 @@ const docTemplate = `{
                     "200": {
                         "description": "Item removed from cart successfully",
                         "schema": {
-                            "type": "message"
+                            "$ref": "#/definitions/models.RemoveItemMessageResponse"
                         }
                     },
                     "400": {
@@ -245,11 +245,33 @@ const docTemplate = `{
                 }
             }
         },
-        "models.Cart": {
+        "models.CartItem": {
+            "type": "object",
+            "properties": {
+                "cart_id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "product": {
+                    "type": "string",
+                    "example": "item1"
+                },
+                "quantity": {
+                    "type": "integer",
+                    "example": 1
+                }
+            }
+        },
+        "models.CreateCartResponse": {
             "type": "object",
             "properties": {
                 "id": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 1
                 },
                 "items": {
                     "type": "array",
@@ -259,28 +281,35 @@ const docTemplate = `{
                 }
             }
         },
-        "models.CartItem": {
-            "type": "object",
-            "properties": {
-                "cart_id": {
-                    "type": "integer"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "product": {
-                    "type": "string"
-                },
-                "quantity": {
-                    "type": "integer"
-                }
-            }
-        },
         "models.ErrorResponse": {
             "type": "object",
             "properties": {
                 "message": {
                     "type": "string"
+                }
+            }
+        },
+        "models.GetCartResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.CartItem"
+                    }
+                }
+            }
+        },
+        "models.RemoveItemMessageResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string",
+                    "example": "Item removed from cart successfully"
                 }
             }
         }

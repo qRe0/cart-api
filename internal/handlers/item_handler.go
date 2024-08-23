@@ -29,7 +29,7 @@ func NewItemHandler(cs service.CartServiceInterface) *ItemHandler {
 // @Produce json
 // @Param cart_id path string true "Cart ID"
 // @Param item body models.AddItemRequest true "Item"
-// @Success 200 {object} models.CartItem
+// @Success 200 {object} models.CartItem "Item added to cart successfully"
 // @Failure 400 {object} models.ErrorResponse "Invalid cart ID"
 // @Failure 401 {object} models.ErrorResponse "Empty claims"
 // @Failure 500 {object} models.ErrorResponse "Internal server error"
@@ -63,7 +63,7 @@ func (h *ItemHandler) AddItemToCart(c *gin.Context) {
 // @Produce json
 // @Param cart_id path string true "Cart ID"
 // @Param item_id path string true "Item ID"
-// @Success 200 {message} string "Item removed from cart successfully"
+// @Success 200 {object} models.RemoveItemMessageResponse "Item removed from cart successfully"
 // @Failure 400 {object} models.ErrorResponse "Invalid cart ID"
 // @Failure 401 {object} models.ErrorResponse "Empty claims"
 // @Failure 500 {object} models.ErrorResponse "Internal server error"

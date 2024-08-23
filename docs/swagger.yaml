@@ -9,29 +9,50 @@ definitions:
         example: 10
         type: integer
     type: object
-  models.Cart:
+  models.CartItem:
+    properties:
+      cart_id:
+        example: 1
+        type: integer
+      id:
+        example: 1
+        type: integer
+      product:
+        example: item1
+        type: string
+      quantity:
+        example: 1
+        type: integer
+    type: object
+  models.CreateCartResponse:
     properties:
       id:
+        example: 1
         type: integer
       items:
         items:
           $ref: '#/definitions/models.CartItem'
         type: array
     type: object
-  models.CartItem:
-    properties:
-      cart_id:
-        type: integer
-      id:
-        type: integer
-      product:
-        type: string
-      quantity:
-        type: integer
-    type: object
   models.ErrorResponse:
     properties:
       message:
+        type: string
+    type: object
+  models.GetCartResponse:
+    properties:
+      id:
+        example: 1
+        type: integer
+      items:
+        items:
+          $ref: '#/definitions/models.CartItem'
+        type: array
+    type: object
+  models.RemoveItemMessageResponse:
+    properties:
+      message:
+        example: Item removed from cart successfully
         type: string
     type: object
 externalDocs:
@@ -72,7 +93,7 @@ paths:
       - application/json
       responses:
         "200":
-          description: OK
+          description: Item added to cart successfully
           schema:
             $ref: '#/definitions/models.CartItem'
         "400":
@@ -105,9 +126,9 @@ paths:
       - application/json
       responses:
         "200":
-          description: OK
+          description: Cart retrieved successfully
           schema:
-            $ref: '#/definitions/models.Cart'
+            $ref: '#/definitions/models.GetCartResponse'
         "400":
           description: Invalid cart ID
           schema:
@@ -145,7 +166,7 @@ paths:
         "200":
           description: Item removed from cart successfully
           schema:
-            type: message
+            $ref: '#/definitions/models.RemoveItemMessageResponse'
         "400":
           description: Invalid cart ID
           schema:
@@ -170,9 +191,9 @@ paths:
       - application/json
       responses:
         "201":
-          description: Created
+          description: Cart created successfully
           schema:
-            $ref: '#/definitions/models.Cart'
+            $ref: '#/definitions/models.CreateCartResponse'
         "401":
           description: Empty claims
           schema:

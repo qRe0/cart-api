@@ -25,7 +25,7 @@ func NewCartHandler(cs service.CartServiceInterface) *CartHandler {
 // @Description This method allows user to create cart
 // @Accept json
 // @Produce json
-// @Success 201 {object} models.Cart
+// @Success 201 {object} models.CreateCartResponse "Cart created successfully"
 // @Failure 401 {object} models.ErrorResponse "Empty claims"
 // @Failure 500 {object} models.ErrorResponse "Internal server error"
 // @Router /cart/create [post]
@@ -49,7 +49,7 @@ func (h *CartHandler) CreateCart(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param cart_id path string true "Cart ID"
-// @Success 200 {object} models.Cart
+// @Success 200 {object} models.GetCartResponse "Cart retrieved successfully"
 // @Failure 400 {object} models.ErrorResponse "Invalid cart ID"
 // @Failure 401 {object} models.ErrorResponse "Empty claims"
 // @Failure 500 {object} models.ErrorResponse "Internal server error"
