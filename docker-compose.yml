@@ -1,7 +1,7 @@
 version: '3'
 
 services:
-  database:
+  psql:
     image: postgres:latest
     container_name: cart_database
     restart: unless-stopped
@@ -19,7 +19,7 @@ services:
 
   api:
     depends_on:
-      database:
+      psql:
         condition: service_healthy
     build: .
     container_name: cart_api
