@@ -3,7 +3,10 @@ package migrations
 import (
 	"embed"
 	"fmt"
-	"log"
+	"os"
+	"regexp"
+	"strconv"
+	"strings"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/pressly/goose/v3"
@@ -25,10 +28,12 @@ type Migration struct {
 type Migrator interface {
 	Up() error
 	Down() error
+	Latest() error
 }
 
 func NewMigrator(db *sqlx.DB) (Migrator, error) {
 	goose.SetBaseFS(embedMigrations)
+
 	err := goose.SetDialect("postgres")
 	if err != nil {
 		return nil, fmt.Errorf("failed to set dialect: %w", err)
@@ -40,19 +45,63 @@ func NewMigrator(db *sqlx.DB) (Migrator, error) {
 func (m *Migration) Up() error {
 	err := goose.Up(m.Database.DB, migrationDir)
 	if err != nil {
-		return fmt.Errorf("failed to migrate db: %w", err)
+		return fmt.Errorf("failed to migrate db UP: %w", err)
 	}
 
-	log.Println("Database migrated successfully!")
 	return nil
 }
 
 func (m *Migration) Down() error {
 	err := goose.Down(m.Database.DB, migrationDir)
 	if err != nil {
-		return fmt.Errorf("failed to migrate db: %w", err)
+		return fmt.Errorf("failed to migrate db DOWN: %w", err)
 	}
 
-	log.Println("Database down successfully!")
 	return nil
+}
+
+func (m *Migration) Latest() error {
+	latest, err := getLatestMigrationVersion()
+	if err != nil {
+		return fmt.Errorf("failed to get latest migration version: %w", err)
+	}
+
+	err = goose.UpTo(m.Database.DB, migrationDir, latest)
+	if err != nil {
+		return fmt.Errorf("failed to migrate db to latest version: %w", err)
+	}
+
+	return nil
+}
+
+func getLatestMigrationVersion() (int64, error) {
+	files, err := os.ReadDir("./internal/migrations")
+	if err != nil {
+		return 0, err
+	}
+
+	var latestVersion int64
+	rx := regexp.MustCompile(`^(\d+)_.*\.sql$`)
+
+	for _, file := range files {
+		if file.IsDir() {
+			continue
+		}
+
+		if !strings.HasSuffix(file.Name(), ".sql") {
+			continue
+		}
+		matches := rx.FindStringSubmatch(file.Name())
+
+		version, err := strconv.ParseInt(matches[1], 10, 64)
+		if err != nil {
+			return 0, err
+		}
+
+		if version > latestVersion {
+			latestVersion = version
+		}
+	}
+
+	return latestVersion, nil
 }
