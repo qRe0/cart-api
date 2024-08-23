@@ -11,6 +11,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/gin-gonic/gin"
 	"github.com/jmoiron/sqlx"
 	"github.com/qRe0/innowise-cart-api/configs"
 	errs "github.com/qRe0/innowise-cart-api/internal/errors"
@@ -31,11 +32,11 @@ func Run() {
 		log.Fatalln(err)
 	}
 
-	m, err := migrations.NewMigrator(db)
+	migrator, err := migrations.NewMigrator(db)
 	if err != nil {
 		log.Fatalln(err)
 	}
-	err = m.Up()
+	err = migrator.Latest()
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -47,26 +48,22 @@ func Run() {
 		}
 	}(db)
 
-	cartRepo := repository.NewCartRepository(db)
-	cartService := service.NewCartService(cartRepo)
+	cartRepository := repository.NewCartRepository(db)
+	cartService := service.NewCartService(cartRepository)
 	handler := handlers.NewHandler(cartService)
 
-	http.HandleFunc("/carts", handler.CartHandler.CreateCart)
-	http.HandleFunc("/carts/", func(w http.ResponseWriter, r *http.Request) {
-		switch r.Method {
-		case http.MethodPost:
-			handler.ItemHandler.AddItemToCart(w, r)
-		case http.MethodGet:
-			handler.CartHandler.GetCart(w, r)
-		case http.MethodDelete:
-			handler.ItemHandler.RemoveItemFromCart(w, r)
-		}
-	})
+	router := gin.Default()
+
+	cart := router.Group("/cart")
+	cart.POST("/create", handler.CartHandler.CreateCart)
+	cart.GET("/:cart_id/get", handler.CartHandler.GetCart)
+	cart.POST("/:cart_id/add", handler.ItemHandler.AddItemToCart)
+	cart.DELETE("/:cart_id/remove/:item_id:", handler.ItemHandler.RemoveItemFromCart)
 
 	port := fmt.Sprintf(":%s", cfg.API.Port)
-
-	srv := http.Server{
-		Addr: port,
+	server := &http.Server{
+		Addr:    port,
+		Handler: router,
 	}
 
 	stop := make(chan os.Signal, 1)
@@ -74,7 +71,7 @@ func Run() {
 
 	go func() {
 		log.Printf("Server is running on port %s", port)
-		err := srv.ListenAndServe()
+		err := server.ListenAndServe()
 		if err != nil && !errors.Is(err, http.ErrServerClosed) {
 			log.Fatalf("Server failed to start: %v", err)
 		}
@@ -84,8 +81,7 @@ func Run() {
 
 	log.Println("Server is shutting down...")
 
-	envTimeout := fmt.Sprintf("%sms", cfg.API.ShutdownTimeout)
-	timeout, err := time.ParseDuration(envTimeout)
+	timeout, err := time.ParseDuration(cfg.API.ShutdownTimeout)
 	if err != nil {
 		log.Fatalf("Failed to parse shutdown timeout: %v", err)
 	}
@@ -93,7 +89,7 @@ func Run() {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 
-	err = srv.Shutdown(ctx)
+	err = server.Shutdown(ctx)
 	if err != nil {
 		log.Fatalf("Server forced to shutdown: %v", err)
 	}

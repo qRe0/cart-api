@@ -7,7 +7,7 @@ RUN go mod download
 
 COPY . .
 
-RUN go build -o start ./cmd/main.go
+RUN go build -o api ./cmd/main.go
 
 FROM alpine:latest
 
@@ -17,7 +17,8 @@ WORKDIR /root/
 
 COPY --from=builder /app/start .
 COPY --from=builder /app/.env .
+COPY --from=builder /app/internal/migrations /root/internal/migrations
 
 EXPOSE ${API_PORT}
 
-CMD ["./start"]
+CMD ["./api"]
