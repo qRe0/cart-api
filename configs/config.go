@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"github.com/joho/godotenv"
-	errs "github.com/qRe0/innowise-cart-api/internal/errors"
+	errs "github.com/qRe0/cart-api/internal/errors"
 )
 
 type APIConfig struct {

@@ -13,12 +13,14 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/jmoiron/sqlx"
-	"github.com/qRe0/innowise-cart-api/configs"
-	errs "github.com/qRe0/innowise-cart-api/internal/errors"
-	"github.com/qRe0/innowise-cart-api/internal/handlers"
-	"github.com/qRe0/innowise-cart-api/internal/migrations"
-	"github.com/qRe0/innowise-cart-api/internal/repository"
-	"github.com/qRe0/innowise-cart-api/internal/service"
+	"github.com/qRe0/cart-api/configs"
+	errs "github.com/qRe0/cart-api/internal/errors"
+	"github.com/qRe0/cart-api/internal/handlers"
+	"github.com/qRe0/cart-api/internal/migrations"
+	"github.com/qRe0/cart-api/internal/repository"
+	"github.com/qRe0/cart-api/internal/service"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 func Run() {
@@ -53,12 +55,13 @@ func Run() {
 	handler := handlers.NewHandler(cartService)
 
 	router := gin.Default()
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	cart := router.Group("/cart")
 	cart.POST("/create", handler.CartHandler.CreateCart)
 	cart.GET("/:cart_id/get", handler.CartHandler.GetCart)
 	cart.POST("/:cart_id/add", handler.ItemHandler.AddItemToCart)
-	cart.DELETE("/:cart_id/remove/:item_id:", handler.ItemHandler.RemoveItemFromCart)
+	cart.DELETE("/:cart_id/remove/:item_id", handler.ItemHandler.RemoveItemFromCart)
 
 	port := fmt.Sprintf(":%s", cfg.API.Port)
 	server := &http.Server{

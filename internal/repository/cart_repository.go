@@ -7,9 +7,9 @@ import (
 
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
-	"github.com/qRe0/innowise-cart-api/configs"
-	errs "github.com/qRe0/innowise-cart-api/internal/errors"
-	"github.com/qRe0/innowise-cart-api/internal/models"
+	"github.com/qRe0/cart-api/configs"
+	errs "github.com/qRe0/cart-api/internal/errors"
+	"github.com/qRe0/cart-api/internal/models"
 )
 
 const (

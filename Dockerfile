@@ -15,7 +15,7 @@ RUN apk --no-cache add ca-certificates postgresql-client
 
 WORKDIR /root/
 
-COPY --from=builder /app/start .
+COPY --from=builder /app/api .
 COPY --from=builder /app/.env .
 COPY --from=builder /app/internal/migrations /root/internal/migrations
 

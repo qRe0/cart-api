@@ -3,7 +3,7 @@ package repository
 import (
 	"context"
 
-	"github.com/qRe0/innowise-cart-api/internal/models"
+	"github.com/qRe0/cart-api/internal/models"
 )
 
 type CartRepositoryInterface interface {

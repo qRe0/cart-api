@@ -1,6 +1,6 @@
 package handlers
 
-import "github.com/qRe0/innowise-cart-api/internal/service"
+import "github.com/qRe0/cart-api/internal/service"
 
 type Handler struct {
 	CartHandler *CartHandler
