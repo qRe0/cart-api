@@ -32,11 +32,11 @@ func Run() {
 		log.Fatalln(err)
 	}
 
-	m, err := migrations.NewMigrator(db)
+	migrator, err := migrations.NewMigrator(db)
 	if err != nil {
 		log.Fatalln(err)
 	}
-	err = m.Up()
+	err = migrator.Latest()
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -61,8 +61,7 @@ func Run() {
 	cart.DELETE("/:cart_id/remove/:item_id:", handler.ItemHandler.RemoveItemFromCart)
 
 	port := fmt.Sprintf(":%s", cfg.API.Port)
-
-	srv := &http.Server{
+	server := &http.Server{
 		Addr:    port,
 		Handler: router,
 	}
@@ -72,7 +71,7 @@ func Run() {
 
 	go func() {
 		log.Printf("Server is running on port %s", port)
-		err := srv.ListenAndServe()
+		err := server.ListenAndServe()
 		if err != nil && !errors.Is(err, http.ErrServerClosed) {
 			log.Fatalf("Server failed to start: %v", err)
 		}
@@ -90,7 +89,7 @@ func Run() {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 
-	err = srv.Shutdown(ctx)
+	err = server.Shutdown(ctx)
 	if err != nil {
 		log.Fatalf("Server forced to shutdown: %v", err)
 	}
