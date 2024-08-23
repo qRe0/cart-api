@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"testing"
 
 	errs "github.com/qRe0/innowise-cart-api/internal/errors"
@@ -11,24 +12,25 @@ import (
 
 type MockCartRepository struct {
 	mock.Mock
+	ctx context.Context
 }
 
-func (m *MockCartRepository) CreateCart() (*models.Cart, error) {
+func (m *MockCartRepository) CreateCart(ctx context.Context) (*models.Cart, error) {
 	args := m.Called()
 	return args.Get(0).(*models.Cart), args.Error(1)
 }
 
-func (m *MockCartRepository) AddItemToCart(item models.CartItem) (*models.CartItem, error) {
+func (m *MockCartRepository) AddItemToCart(ctx context.Context, item models.CartItem) (*models.CartItem, error) {
 	args := m.Called(item)
 	return args.Get(0).(*models.CartItem), args.Error(1)
 }
 
-func (m *MockCartRepository) RemoveItemFromCart(item *models.CartItem) error {
+func (m *MockCartRepository) RemoveItemFromCart(ctx context.Context, item *models.CartItem) error {
 	args := m.Called(item)
 	return args.Error(0)
 }
 
-func (m *MockCartRepository) GetCart(cart *models.Cart) (*models.Cart, error) {
+func (m *MockCartRepository) GetCart(ctx context.Context, cart *models.Cart) (*models.Cart, error) {
 	args := m.Called(cart)
 	return args.Get(0).(*models.Cart), args.Error(1)
 }
@@ -43,7 +45,7 @@ func TestCartService_CreateCart(t *testing.T) {
 	}
 	mockRepo.On("CreateCart").Return(expectedCart, nil)
 
-	cart, err := service.CreateCart()
+	cart, err := service.CreateCart(mockRepo.ctx)
 	assert.NoError(t, err)
 	assert.Equal(t, expectedCart, cart)
 	mockRepo.AssertExpectations(t)
@@ -126,7 +128,7 @@ func TestCartService_AddItemToCart(t *testing.T) {
 		t.Run(testCase.name, func(t *testing.T) {
 			testCase.setupMock()
 
-			result, err := service.AddItemToCart(testCase.cartID, testCase.item)
+			result, err := service.AddItemToCart(mockRepo.ctx, testCase.cartID, testCase.item)
 			if testCase.expectedErr != nil {
 				assert.ErrorIs(t, err, testCase.expectedErr)
 			} else {
@@ -197,7 +199,7 @@ func TestCartService_RemoveItemFromCart(t *testing.T) {
 		t.Run(testCase.name, func(t *testing.T) {
 			testCase.setupMock()
 
-			err := service.RemoveItemFromCart(testCase.cartID, testCase.itemID)
+			err := service.RemoveItemFromCart(mockRepo.ctx, testCase.cartID, testCase.itemID)
 			if testCase.expectedErr != nil {
 				assert.ErrorIs(t, err, testCase.expectedErr)
 			} else {
@@ -274,7 +276,7 @@ func TestCartService_GetCart(t *testing.T) {
 		t.Run(testCase.name, func(t *testing.T) {
 			testCase.setupMock()
 
-			result, err := service.GetCart(testCase.cartID)
+			result, err := service.GetCart(mockRepo.ctx, testCase.cartID)
 			if testCase.expectedErr != nil {
 				assert.ErrorIs(t, err, testCase.expectedErr)
 			} else {

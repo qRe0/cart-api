@@ -14,4 +14,6 @@ var (
 	ErrLoadEnvVars       = errors.New("error loading environment variables")
 	ErrEncoding          = errors.New("error encoding")
 	ErrDecodingReqBody   = errors.New("error decoding request body")
+	ErrStartTransaction  = errors.New("error starting transaction")
+	ErrCommitTransaction = errors.New("error committing transaction")
 )

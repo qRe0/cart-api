@@ -1,32 +1,30 @@
 APP_NAME = inno_cart
 DOCKER_COMPOSE_FILE = docker-compose.yml
 
-GO_FILES := $(shell find . -type f -name '*.go')
-
 test:
 	@echo "Running tests..."
-	@go test ./...
+	@go test -v ./...
 	@echo "Tests passed!"
 
 build: test
 	@echo "Building the Go binary..."
-	@go build -o $(APP_NAME) ./cmd
+	@go build -o ./bin/${APP_NAME} ./cmd
 	@echo "Build successful!"
-
 
 docker-up: build
 	@echo "Starting the Docker containers..."
-	@docker-compose -f $(DOCKER_COMPOSE_FILE) up -d
+	@docker-compose -f ${DOCKER_COMPOSE_FILE} up --build -d
 	@echo "Docker containers are up and running!"
 
 docker-down:
 	@echo "Stopping the Docker containers..."
-	@docker-compose -f $(DOCKER_COMPOSE_FILE) down
+	@docker-compose -f ${DOCKER_COMPOSE_FILE} down
 	@echo "Docker containers are stopped!"
 
 clean:
 	@echo "Cleaning up..."
-	@rm -f $(APP_NAME)
+	@rm -f ./bin/${APP_NAME}
+	@rm -rf ./bin
 	@echo "Cleaned up!"
 
 deploy: docker-up

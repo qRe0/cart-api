@@ -21,6 +21,8 @@ func NewItemHandler(cs service.CartServiceInterface) *ItemHandler {
 }
 
 func (h *ItemHandler) AddItemToCart(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
 	cartIDStr := r.URL.Path[len("/carts/"):]
 	cartIDStr = cartIDStr[:len(cartIDStr)-len("/items")]
 
@@ -31,7 +33,7 @@ func (h *ItemHandler) AddItemToCart(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	item, err := h.service.AddItemToCart(cartIDStr, parsedItem)
+	item, err := h.service.AddItemToCart(ctx, cartIDStr, parsedItem)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
@@ -47,6 +49,8 @@ func (h *ItemHandler) AddItemToCart(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *ItemHandler) RemoveItemFromCart(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
 	path := r.URL.Path
 	re := regexp.MustCompile(`/carts/(\d+)/items/(\d+)`)
 	matches := re.FindStringSubmatch(path)
@@ -59,7 +63,7 @@ func (h *ItemHandler) RemoveItemFromCart(w http.ResponseWriter, r *http.Request)
 		http.Error(w, "error in URL", http.StatusBadRequest)
 	}
 
-	err := h.service.RemoveItemFromCart(cartIDStr, itemIDStr)
+	err := h.service.RemoveItemFromCart(ctx, cartIDStr, itemIDStr)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return

@@ -1,9 +1,7 @@
 package service
 
 import (
-	"database/sql"
-	"errors"
-	"fmt"
+	"context"
 	"strconv"
 
 	errs "github.com/qRe0/innowise-cart-api/internal/errors"
@@ -21,17 +19,16 @@ func NewCartService(repo repository.CartRepositoryInterface) *CartService {
 	}
 }
 
-func (c *CartService) CreateCart() (*models.Cart, error) {
-	cart, err := c.repo.CreateCart()
-
+func (c *CartService) CreateCart(ctx context.Context) (*models.Cart, error) {
+	cart, err := c.repo.CreateCart(ctx)
 	if err != nil {
-		return nil, errs.ErrCreateCart
+		return nil, err
 	}
 
 	return cart, nil
 }
 
-func (c *CartService) AddItemToCart(cartIDStr string, item models.CartItem) (*models.CartItem, error) {
+func (c *CartService) AddItemToCart(ctx context.Context, cartIDStr string, item models.CartItem) (*models.CartItem, error) {
 	cartID, err := strconv.Atoi(cartIDStr)
 	if err != nil || cartID <= 0 {
 		return nil, errs.ErrWrongCartID
@@ -44,7 +41,7 @@ func (c *CartService) AddItemToCart(cartIDStr string, item models.CartItem) (*mo
 	}
 
 	item.CartID = cartID
-	result, err := c.repo.AddItemToCart(item)
+	result, err := c.repo.AddItemToCart(ctx, item)
 	if err != nil {
 		return nil, err
 	}
@@ -52,7 +49,7 @@ func (c *CartService) AddItemToCart(cartIDStr string, item models.CartItem) (*mo
 	return result, nil
 }
 
-func (c *CartService) RemoveItemFromCart(cartIDStr, itemIDStr string) error {
+func (c *CartService) RemoveItemFromCart(ctx context.Context, cartIDStr, itemIDStr string) error {
 	cartID, err := strconv.Atoi(cartIDStr)
 	if err != nil || cartID <= 0 {
 		return errs.ErrWrongCartID
@@ -68,7 +65,7 @@ func (c *CartService) RemoveItemFromCart(cartIDStr, itemIDStr string) error {
 		CartID: cartID,
 	}
 
-	err = c.repo.RemoveItemFromCart(item)
+	err = c.repo.RemoveItemFromCart(ctx, item)
 	if err != nil {
 		return err
 	}
@@ -76,7 +73,7 @@ func (c *CartService) RemoveItemFromCart(cartIDStr, itemIDStr string) error {
 	return nil
 }
 
-func (c *CartService) GetCart(cartIDStr string) (*models.Cart, error) {
+func (c *CartService) GetCart(ctx context.Context, cartIDStr string) (*models.Cart, error) {
 	cartID, err := strconv.Atoi(cartIDStr)
 	if err != nil || cartID <= 0 {
 		return nil, errs.ErrWrongCartID
@@ -86,12 +83,9 @@ func (c *CartService) GetCart(cartIDStr string) (*models.Cart, error) {
 		ID: cartID,
 	}
 
-	resCart, err := c.repo.GetCart(cart)
+	resCart, err := c.repo.GetCart(ctx, cart)
 	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return nil, errs.ErrCartNotFound
-		}
-		return nil, fmt.Errorf("database error: %w", err)
+		return nil, err
 	}
 
 	return resCart, nil
