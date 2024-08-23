@@ -82,8 +82,7 @@ func Run() {
 
 	log.Println("Server is shutting down...")
 
-	envTimeout := fmt.Sprintf("%sms", cfg.API.ShutdownTimeout)
-	timeout, err := time.ParseDuration(envTimeout)
+	timeout, err := time.ParseDuration(cfg.API.ShutdownTimeout)
 	if err != nil {
 		log.Fatalf("Failed to parse shutdown timeout: %v", err)
 	}
