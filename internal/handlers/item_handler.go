@@ -4,9 +4,10 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	errs "github.com/qRe0/innowise-cart-api/internal/errors"
-	"github.com/qRe0/innowise-cart-api/internal/models"
-	"github.com/qRe0/innowise-cart-api/internal/service"
+	_ "github.com/qRe0/cart-api/docs"
+	errs "github.com/qRe0/cart-api/internal/errors"
+	"github.com/qRe0/cart-api/internal/models"
+	"github.com/qRe0/cart-api/internal/service"
 )
 
 type ItemHandler struct {
@@ -19,6 +20,20 @@ func NewItemHandler(cs service.CartServiceInterface) *ItemHandler {
 	}
 }
 
+// AddItemToCart godoc
+// @Tags CartItem Operations. This is a simple API for online shopping cart
+// @Summary Add item to shopping cart
+// @Schemes
+// @Description This method allows user to add item to cart
+// @Accept json
+// @Produce json
+// @Param cart_id path string true "Cart ID"
+// @Param item body models.AddItemRequest true "Item"
+// @Success 200 {object} models.CartItem "Item added to cart successfully"
+// @Failure 400 {object} models.ErrorResponse "Invalid cart ID"
+// @Failure 401 {object} models.ErrorResponse "Empty claims"
+// @Failure 500 {object} models.ErrorResponse "Internal server error"
+// @Router /cart/{cart_id}/add [post]
 func (h *ItemHandler) AddItemToCart(c *gin.Context) {
 	ctx := c.Request.Context()
 
@@ -39,6 +54,20 @@ func (h *ItemHandler) AddItemToCart(c *gin.Context) {
 	c.JSON(http.StatusOK, item)
 }
 
+// RemoveItemFromCart godoc
+// @Tags CartItem Operations. This is a simple API for online shopping cart
+// @Summary Remove item from shopping cart
+// @Schemes
+// @Description This method allows user to remove item from cart
+// @Accept json
+// @Produce json
+// @Param cart_id path string true "Cart ID"
+// @Param item_id path string true "Item ID"
+// @Success 200 {object} models.RemoveItemMessageResponse "Item removed from cart successfully"
+// @Failure 400 {object} models.ErrorResponse "Invalid cart ID"
+// @Failure 401 {object} models.ErrorResponse "Empty claims"
+// @Failure 500 {object} models.ErrorResponse "Internal server error"
+// @Router /cart/{cart_id}/remove/{item_id} [delete]
 func (h *ItemHandler) RemoveItemFromCart(c *gin.Context) {
 	ctx := c.Request.Context()
 

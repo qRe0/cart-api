@@ -4,9 +4,9 @@ import (
 	"context"
 	"strconv"
 
-	errs "github.com/qRe0/innowise-cart-api/internal/errors"
-	"github.com/qRe0/innowise-cart-api/internal/models"
-	"github.com/qRe0/innowise-cart-api/internal/repository"
+	errs "github.com/qRe0/cart-api/internal/errors"
+	"github.com/qRe0/cart-api/internal/models"
+	"github.com/qRe0/cart-api/internal/repository"
 )
 
 type CartService struct {

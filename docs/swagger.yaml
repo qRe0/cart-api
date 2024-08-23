@@ -1,0 +1,215 @@
+basePath: /
+definitions:
+  models.AddItemRequest:
+    properties:
+      product:
+        example: apple
+        type: string
+      quantity:
+        example: 10
+        type: integer
+    type: object
+  models.CartItem:
+    properties:
+      cart_id:
+        example: 1
+        type: integer
+      id:
+        example: 1
+        type: integer
+      product:
+        example: item1
+        type: string
+      quantity:
+        example: 1
+        type: integer
+    type: object
+  models.CreateCartResponse:
+    properties:
+      id:
+        example: 1
+        type: integer
+      items:
+        items:
+          $ref: '#/definitions/models.CartItem'
+        type: array
+    type: object
+  models.ErrorResponse:
+    properties:
+      message:
+        type: string
+    type: object
+  models.GetCartResponse:
+    properties:
+      id:
+        example: 1
+        type: integer
+      items:
+        items:
+          $ref: '#/definitions/models.CartItem'
+        type: array
+    type: object
+  models.RemoveItemMessageResponse:
+    properties:
+      message:
+        example: Item removed from cart successfully
+        type: string
+    type: object
+externalDocs:
+  description: OpenAPI
+  url: https://swagger.io/resources/open-api/
+host: localhost:3000
+info:
+  contact:
+    email: support@swagger.io
+    name: API Support
+    url: http://www.swagger.io/support
+  description: This is a simple API for online shopping cart
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Online shopping cart API
+  version: "1.0"
+paths:
+  /cart/{cart_id}/add:
+    post:
+      consumes:
+      - application/json
+      description: This method allows user to add item to cart
+      parameters:
+      - description: Cart ID
+        in: path
+        name: cart_id
+        required: true
+        type: string
+      - description: Item
+        in: body
+        name: item
+        required: true
+        schema:
+          $ref: '#/definitions/models.AddItemRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Item added to cart successfully
+          schema:
+            $ref: '#/definitions/models.CartItem'
+        "400":
+          description: Invalid cart ID
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: Empty claims
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Add item to shopping cart
+      tags:
+      - CartItem Operations. This is a simple API for online shopping cart
+  /cart/{cart_id}/get:
+    get:
+      consumes:
+      - application/json
+      description: This method allows user to get cart by ID
+      parameters:
+      - description: Cart ID
+        in: path
+        name: cart_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Cart retrieved successfully
+          schema:
+            $ref: '#/definitions/models.GetCartResponse'
+        "400":
+          description: Invalid cart ID
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: Empty claims
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Get shopping cart
+      tags:
+      - Cart Operations. This is a simple API for online shopping cart
+  /cart/{cart_id}/remove/{item_id}:
+    delete:
+      consumes:
+      - application/json
+      description: This method allows user to remove item from cart
+      parameters:
+      - description: Cart ID
+        in: path
+        name: cart_id
+        required: true
+        type: string
+      - description: Item ID
+        in: path
+        name: item_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Item removed from cart successfully
+          schema:
+            $ref: '#/definitions/models.RemoveItemMessageResponse'
+        "400":
+          description: Invalid cart ID
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: Empty claims
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Remove item from shopping cart
+      tags:
+      - CartItem Operations. This is a simple API for online shopping cart
+  /cart/create:
+    post:
+      consumes:
+      - application/json
+      description: This method allows user to create cart
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Cart created successfully
+          schema:
+            $ref: '#/definitions/models.CreateCartResponse'
+        "401":
+          description: Empty claims
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Creates shopping cart
+      tags:
+      - Cart Operations. This is a simple API for online shopping cart
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
