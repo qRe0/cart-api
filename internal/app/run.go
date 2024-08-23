@@ -11,6 +11,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/gin-gonic/gin"
 	"github.com/jmoiron/sqlx"
 	"github.com/qRe0/innowise-cart-api/configs"
 	errs "github.com/qRe0/innowise-cart-api/internal/errors"
@@ -47,26 +48,22 @@ func Run() {
 		}
 	}(db)
 
-	cartRepo := repository.NewCartRepository(db)
-	cartService := service.NewCartService(cartRepo)
+	cartRepository := repository.NewCartRepository(db)
+	cartService := service.NewCartService(cartRepository)
 	handler := handlers.NewHandler(cartService)
 
-	http.HandleFunc("/carts", handler.CartHandler.CreateCart)
-	http.HandleFunc("/carts/", func(w http.ResponseWriter, r *http.Request) {
-		switch r.Method {
-		case http.MethodPost:
-			handler.ItemHandler.AddItemToCart(w, r)
-		case http.MethodGet:
-			handler.CartHandler.GetCart(w, r)
-		case http.MethodDelete:
-			handler.ItemHandler.RemoveItemFromCart(w, r)
-		}
-	})
+	router := gin.Default()
+
+	router.POST("/carts", handler.CartHandler.CreateCart)
+	router.GET("/carts/{id}", handler.CartHandler.GetCart)
+	router.POST("/carts/{id}/items", handler.ItemHandler.AddItemToCart)
+	router.DELETE("/carts/{id}/items/{item_id}", handler.ItemHandler.RemoveItemFromCart)
 
 	port := fmt.Sprintf(":%s", cfg.API.Port)
 
-	srv := http.Server{
-		Addr: port,
+	srv := &http.Server{
+		Addr:    port,
+		Handler: router,
 	}
 
 	stop := make(chan os.Signal, 1)

@@ -1,10 +1,9 @@
 package handlers
 
 import (
-	"encoding/json"
 	"net/http"
 
-	errs "github.com/qRe0/innowise-cart-api/internal/errors"
+	"github.com/gin-gonic/gin"
 	"github.com/qRe0/innowise-cart-api/internal/service"
 )
 
@@ -18,38 +17,26 @@ func NewCartHandler(cs service.CartServiceInterface) *CartHandler {
 	}
 }
 
-func (h *CartHandler) CreateCart(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
+func (h *CartHandler) CreateCart(c *gin.Context) {
+	ctx := c.Request.Context()
 	cart, err := h.service.CreateCart(ctx)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusCreated)
-	err = json.NewEncoder(w).Encode(cart)
-	if err != nil {
-		http.Error(w, errs.ErrEncoding.Error(), http.StatusBadRequest)
-		return
-	}
+	c.JSON(http.StatusCreated, cart)
 }
 
-func (h *CartHandler) GetCart(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-	cartIDStr := r.URL.Path[len("/carts/"):]
+func (h *CartHandler) GetCart(c *gin.Context) {
+	ctx := c.Request.Context()
+	cartIDStr := c.Param("id")
 
 	cart, err := h.service.GetCart(ctx, cartIDStr)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	err = json.NewEncoder(w).Encode(cart)
-	if err != nil {
-		http.Error(w, errs.ErrEncoding.Error(), http.StatusBadRequest)
-		return
-	}
+	c.JSON(http.StatusOK, cart)
 }

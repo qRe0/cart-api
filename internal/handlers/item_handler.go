@@ -1,10 +1,9 @@
 package handlers
 
 import (
-	"encoding/json"
 	"net/http"
-	"regexp"
 
+	"github.com/gin-gonic/gin"
 	errs "github.com/qRe0/innowise-cart-api/internal/errors"
 	"github.com/qRe0/innowise-cart-api/internal/models"
 	"github.com/qRe0/innowise-cart-api/internal/service"
@@ -20,60 +19,41 @@ func NewItemHandler(cs service.CartServiceInterface) *ItemHandler {
 	}
 }
 
-func (h *ItemHandler) AddItemToCart(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
+func (h *ItemHandler) AddItemToCart(c *gin.Context) {
+	ctx := c.Request.Context()
 
-	cartIDStr := r.URL.Path[len("/carts/"):]
-	cartIDStr = cartIDStr[:len(cartIDStr)-len("/items")]
+	cartIDStr := c.Param("id")
 
 	var parsedItem models.CartItem
-	err := json.NewDecoder(r.Body).Decode(&parsedItem)
-	if err != nil {
-		http.Error(w, errs.ErrDecodingReqBody.Error(), http.StatusBadRequest)
+	if err := c.ShouldBindJSON(&parsedItem); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": errs.ErrDecodingReqBody.Error()})
 		return
 	}
 
 	item, err := h.service.AddItemToCart(ctx, cartIDStr, parsedItem)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	err = json.NewEncoder(w).Encode(item)
-	if err != nil {
-		http.Error(w, errs.ErrEncoding.Error(), http.StatusBadRequest)
-		return
-	}
+	c.JSON(http.StatusOK, item)
 }
 
-func (h *ItemHandler) RemoveItemFromCart(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
+func (h *ItemHandler) RemoveItemFromCart(c *gin.Context) {
+	ctx := c.Request.Context()
 
-	path := r.URL.Path
-	re := regexp.MustCompile(`/carts/(\d+)/items/(\d+)`)
-	matches := re.FindStringSubmatch(path)
+	cartIDStr := c.Param("id")
+	itemIDStr := c.Param("item_id")
 
-	var cartIDStr, itemIDStr string
-	if len(matches) == 3 {
-		cartIDStr = matches[1]
-		itemIDStr = matches[2]
-	} else {
-		http.Error(w, "error in URL", http.StatusBadRequest)
-	}
-
-	err := h.service.RemoveItemFromCart(ctx, cartIDStr, itemIDStr)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+	if cartIDStr == "" || itemIDStr == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid URL parameters"})
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	_, err = w.Write([]byte("{}"))
-	if err != nil {
-		http.Error(w, errs.ErrEncoding.Error(), http.StatusBadRequest)
+	if err := h.service.RemoveItemFromCart(ctx, cartIDStr, itemIDStr); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+
+	c.JSON(http.StatusOK, gin.H{})
 }
