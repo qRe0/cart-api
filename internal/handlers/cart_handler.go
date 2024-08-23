@@ -30,7 +30,7 @@ func (h *CartHandler) CreateCart(c *gin.Context) {
 
 func (h *CartHandler) GetCart(c *gin.Context) {
 	ctx := c.Request.Context()
-	cartIDStr := c.Param("id")
+	cartIDStr := c.Param("cart_id")
 
 	cart, err := h.service.GetCart(ctx, cartIDStr)
 	if err != nil {

@@ -7,7 +7,7 @@ This repository contains a Go-based implementation of a REST API for an online s
 
 ## Implementation Details
 
-The API supports basic CRUD operations for an online shopping cart. The data is persisted using Postgres, leveraging the `sqlx` library for database interactions. All SQL queries are manually written to ensure clarity and precision. The project is built with a focus on simplicity, security, and performance, utilizing the default `net/http` package for RESTful implementations.
+The API supports basic CRUD operations for an online shopping cart. The data is persisted using Postgres, leveraging the `sqlx` library for database interactions. All SQL queries are manually written to ensure clarity and precision. The project is built with a focus on simplicity, security, and performance, utilizing the default `gin` package for RESTful implementations.
 
 ### Domain Types
 
@@ -23,7 +23,7 @@ The following endpoints have been implemented:
 Creates a new cart with a unique ID and returns the newly created cart.
 
 ```sh
-POST http://localhost:3000/carts -d '{}'
+POST http://localhost:3000/cart/create -d '{}'
 ```
 
 ```json
@@ -38,7 +38,7 @@ POST http://localhost:3000/carts -d '{}'
 Adds a new item to an existing cart. The operation fails if the cart does not exist, if the product name is blank, or if the quantity is non-positive.
 
 ```sh
-POST http://localhost:3000/carts/1/items -d '{
+POST http://localhost:3000/cart/{cart_id}/add -d '{
 	"product": "Shoes",
 	"quantity": 10
 }'
@@ -58,11 +58,13 @@ POST http://localhost:3000/carts/1/items -d '{
 Removes an existing item from a cart. The operation fails if the cart or the item does not exist.
 
 ```sh
-DELETE http://localhost:3000/carts/1/items/1
+DELETE http://localhost:3000/cart/{cart_id}/remove/{item_id}
 ```
 
 ```json
-{}
+{
+  "message": "Item removed from cart successfully"
+}
 ```
 
 
@@ -71,7 +73,7 @@ DELETE http://localhost:3000/carts/1/items/1
 Retrieves an existing cart along with its items. The operation fails if the cart does not exist.
 
 ```sh
-GET http://localhost:3000/carts/1
+GET http://localhost:3000/cart/{cart_id}/get
 ```
 
 ```json

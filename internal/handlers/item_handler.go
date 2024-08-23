@@ -22,7 +22,7 @@ func NewItemHandler(cs service.CartServiceInterface) *ItemHandler {
 func (h *ItemHandler) AddItemToCart(c *gin.Context) {
 	ctx := c.Request.Context()
 
-	cartIDStr := c.Param("id")
+	cartIDStr := c.Param("cart_id")
 
 	var parsedItem models.CartItem
 	if err := c.ShouldBindJSON(&parsedItem); err != nil {
@@ -42,7 +42,7 @@ func (h *ItemHandler) AddItemToCart(c *gin.Context) {
 func (h *ItemHandler) RemoveItemFromCart(c *gin.Context) {
 	ctx := c.Request.Context()
 
-	cartIDStr := c.Param("id")
+	cartIDStr := c.Param("cart_id")
 	itemIDStr := c.Param("item_id")
 
 	if cartIDStr == "" || itemIDStr == "" {
@@ -55,5 +55,5 @@ func (h *ItemHandler) RemoveItemFromCart(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{})
+	c.JSON(http.StatusOK, gin.H{"message": "Item removed from cart successfully"})
 }

@@ -54,10 +54,11 @@ func Run() {
 
 	router := gin.Default()
 
-	router.POST("/carts", handler.CartHandler.CreateCart)
-	router.GET("/carts/{id}", handler.CartHandler.GetCart)
-	router.POST("/carts/{id}/items", handler.ItemHandler.AddItemToCart)
-	router.DELETE("/carts/{id}/items/{item_id}", handler.ItemHandler.RemoveItemFromCart)
+	cart := router.Group("/cart")
+	cart.POST("/create", handler.CartHandler.CreateCart)
+	cart.GET("/:cart_id/get", handler.CartHandler.GetCart)
+	cart.POST("/:cart_id/add", handler.ItemHandler.AddItemToCart)
+	cart.DELETE("/:cart_id/remove/:item_id:", handler.ItemHandler.RemoveItemFromCart)
 
 	port := fmt.Sprintf(":%s", cfg.API.Port)
 
