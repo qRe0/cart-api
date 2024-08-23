@@ -1,39 +1,26 @@
-
 Cart API
 ========
 
 ## Overview
 
-This repository contains a Go programming exercise for interview candidates. 
-You'll be developing an API for an online shopping cart in the Go programming language.
+This repository contains a Go-based implementation of a REST API for an online shopping cart. The application is designed to fulfill a coding exercise, demonstrating key competencies in Go, REST API design, and database interaction.
 
+## Implementation Details
 
-## Requirements
-
-This is a REST API for basic CRUD operations for an online shopping cart. Data
-should be persisted in a storage layer which can use Postgres.
-
-You should use default `net/http` package for REST implementation; `sqlx` or `sqlc` for interact with postgres;
-all the queries should be wrote mannually (no ORM, no `Select` methods and etc.); your repo should be private.
-
-#### Additional requirements
-
-Cover your code with the unit tests (you could use `testify`).
-
-Create a `Dockerfile` for your application.
-
+The API supports basic CRUD operations for an online shopping cart. The data is persisted using Postgres, leveraging the `sqlx` library for database interactions. All SQL queries are manually written to ensure clarity and precision. The project is built with a focus on simplicity, security, and performance, utilizing the default `net/http` package for RESTful implementations.
 
 ### Domain Types
 
-The Cart API consists of two simple types: `Cart` and `CartItem`. The `Cart`
-holds zero or more `CartItem` objects.
+The API manages two main types: `Cart` and `CartItem`. Each `Cart` can contain multiple `CartItem` objects. The `CartItem` entities are created directly in the database to ensure data consistency.
 
-`CartItem` objects should be created in DB exactly (not from application).
+### API Endpoints
+
+The following endpoints have been implemented:
 
 
 ### Create Cart
 
-A new cart should be created and an ID generated. The new empty cart should be returned.
+Creates a new cart with a unique ID and returns the newly created cart.
 
 ```sh
 POST http://localhost:3000/carts -d '{}'
@@ -48,9 +35,7 @@ POST http://localhost:3000/carts -d '{}'
 
 ### Add to cart
 
-A new item should added to an existing cart. Should fail if the cart does not
-exist, if the product name is blank, or if the quantity is non-positive. The
-new item should be returned.
+Adds a new item to an existing cart. The operation fails if the cart does not exist, if the product name is blank, or if the quantity is non-positive.
 
 ```sh
 POST http://localhost:3000/carts/1/items -d '{
@@ -70,8 +55,7 @@ POST http://localhost:3000/carts/1/items -d '{
 
 ### Remove from cart
 
-An existing item should be removed from a cart. Should fail if the cart does not
-exist or if the item does not exist.
+Removes an existing item from a cart. The operation fails if the cart or the item does not exist.
 
 ```sh
 DELETE http://localhost:3000/carts/1/items/1
@@ -84,8 +68,7 @@ DELETE http://localhost:3000/carts/1/items/1
 
 ### View cart
 
-An existing cart should be able to be viewed with its items. Should fail if the
-cart does not exist.
+Retrieves an existing cart along with its items. The operation fails if the cart does not exist.
 
 ```sh
 GET http://localhost:3000/carts/1
