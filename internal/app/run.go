@@ -50,12 +50,21 @@ func Run() {
 		}
 	}(db)
 
+	// Replace strings with env configs
+	address := fmt.Sprintf("%s:%s", "localhost", "50051")
 	cartRepository := repository.NewCartRepository(db)
 	cartService := service.NewCartService(cartRepository)
-	handler := handlers.NewHandler(cartService)
+	handler := handlers.NewHandler(cartService, address)
 
 	router := gin.Default()
+
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+
+	auth := router.Group("/auth")
+	auth.POST("/signup", handler.AuthHandler.SignUp)
+	auth.POST("/login", handler.AuthHandler.LogIn)
+	auth.POST("/logout", handler.AuthHandler.LogOut)
+	auth.POST("/refresh", handler.AuthHandler.Refresh)
 
 	cart := router.Group("/cart")
 	cart.POST("/create", handler.CartHandler.CreateCart)
