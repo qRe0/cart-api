@@ -13,8 +13,6 @@ import (
 )
 
 const (
-	connStrTmpl = "user=%s password=%s dbname=%s host=%s sslmode=disable"
-
 	createCartQuery = `INSERT INTO carts DEFAULT VALUES`
 	maxCartIDQuery  = `SELECT MAX(id) FROM carts`
 	insertItemQuery = `INSERT INTO items (cart_id, product, quantity) 
@@ -38,7 +36,9 @@ func NewCartRepository(db *sqlx.DB) *CartRepository {
 }
 
 func Init(cfg configs.DBConfig) (*sqlx.DB, error) {
-	connStr := fmt.Sprintf(connStrTmpl, cfg.User, cfg.Password, cfg.DBName, cfg.Host)
+	connectingStringTemplate := "postgres://%s:%s@%s:%s/%s?sslmode=disable"
+
+	connStr := fmt.Sprintf(connectingStringTemplate, cfg.User, cfg.Password, cfg.Host, cfg.Port, cfg.DBName)
 
 	db, err := sqlx.Open("postgres", connStr)
 	if err != nil {
