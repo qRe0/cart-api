@@ -29,3 +29,14 @@ type AddItemResponse struct {
 type RemoveItemMessageResponse struct {
 	Message string `json:"message" example:"Item removed from cart successfully"`
 }
+
+type SignUpRequest struct {
+	Name     string `json:"name" binding:"required" example:"John Doe"`
+	Phone    string `json:"phone" binding:"required" example:"+1111111111"`
+	Email    string `json:"email" binding:"required" example:"johndoe1@gmail.com"`
+	Password string `json:"password" binding:"required" example:"123456"`
+}
+
+type SignUpResponse struct {
+	Message string `json:"message" example:"User created successfully!"`
+}

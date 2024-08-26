@@ -55,6 +55,32 @@ definitions:
         example: Item removed from cart successfully
         type: string
     type: object
+  models.SignUpRequest:
+    properties:
+      email:
+        example: johndoe1@gmail.com
+        type: string
+      name:
+        example: John Doe
+        type: string
+      password:
+        example: "123456"
+        type: string
+      phone:
+        example: "+1111111111"
+        type: string
+    required:
+    - email
+    - name
+    - password
+    - phone
+    type: object
+  models.SignUpResponse:
+    properties:
+      message:
+        example: User created successfully!
+        type: string
+    type: object
 externalDocs:
   description: OpenAPI
   url: https://swagger.io/resources/open-api/
@@ -72,6 +98,36 @@ info:
   title: Online shopping cart API
   version: "1.0"
 paths:
+  /auth/signup:
+    post:
+      consumes:
+      - application/json
+      description: This method allows user to create a new user
+      parameters:
+      - description: Input data for user registration
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/models.SignUpRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User created successfully
+          schema:
+            $ref: '#/definitions/models.SignUpResponse'
+        "400":
+          description: Invalid input data
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Sign-Up new user
+      tags:
+      - Public routes. Registration and Authentication
   /cart/{cart_id}/add:
     post:
       consumes:
