@@ -38,7 +38,7 @@ func NewAuthHandler(address string) *AuthHandler {
 
 // SignUp godoc
 // @Tags Public routes. Registration and Authentication
-// @Summary Sign-Up new user
+// @Summary Sign-Up new user and authorize him
 // @Schemes
 // @Description This method allows user to create a new user
 // @Accept json
@@ -56,11 +56,25 @@ func (h *AuthHandler) SignUp(c *gin.Context) {
 		return
 	}
 
-	resp, err := h.signUpClient.SignUp(c, &user)
+	md := metadata.MD{}
+	ctx := metadata.NewOutgoingContext(c.Request.Context(), md)
+
+	var metadataHeader metadata.MD
+	resp, err := h.signUpClient.SignUp(ctx, &user, grpc.Header(&metadataHeader))
 	if err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
+
+	accessToken := metadataHeader.Get("Authorization")
+	refreshToken := metadataHeader.Get("Refresh-Token")
+	if len(accessToken) == 0 || len(refreshToken) == 0 {
+		c.JSON(401, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	c.Header("Authorization", accessToken[0])
+	c.Header("Refresh-Token", refreshToken[0])
 
 	c.JSON(200, gin.H{"message": resp.Message})
 }
