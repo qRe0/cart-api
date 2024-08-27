@@ -140,7 +140,7 @@ const docTemplate = `{
                 "tags": [
                     "Public routes. Registration and Authentication"
                 ],
-                "summary": "Sign-Up new user",
+                "summary": "Sign-Up new user and authorize him",
                 "parameters": [
                     {
                         "description": "Input data for user registration",

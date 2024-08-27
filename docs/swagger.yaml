@@ -225,7 +225,7 @@ paths:
           description: Internal server error
           schema:
             $ref: '#/definitions/models.ErrorResponse'
-      summary: Sign-Up new user
+      summary: Sign-Up new user and authorize him
       tags:
       - Public routes. Registration and Authentication
   /cart/{cart_id}/add:
