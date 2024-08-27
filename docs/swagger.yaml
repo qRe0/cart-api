@@ -67,6 +67,20 @@ definitions:
         example: User logged-in successfully!
         type: string
     type: object
+  models.RefreshRequest:
+    properties:
+      refreshToken:
+        example: '...(numeric-letter string)'
+        type: string
+    required:
+    - refreshToken
+    type: object
+  models.RefreshResponse:
+    properties:
+      message:
+        example: Token refreshed successfully!
+        type: string
+    type: object
   models.RemoveItemMessageResponse:
     properties:
       message:
@@ -148,6 +162,40 @@ paths:
           schema:
             $ref: '#/definitions/models.ErrorResponse'
       summary: Log-In user
+      tags:
+      - Public routes. Registration and Authentication
+  /auth/refresh:
+    post:
+      consumes:
+      - application/json
+      description: This method allows user to release new access and refresh tokens
+      parameters:
+      - description: Input data for token refresh
+        in: body
+        name: token
+        required: true
+        schema:
+          $ref: '#/definitions/models.RefreshRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Tokens refreshed successfully
+          schema:
+            $ref: '#/definitions/models.RefreshResponse'
+        "400":
+          description: Invalid input data
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Refresh user tokens (Access and Refresh)
       tags:
       - Public routes. Registration and Authentication
   /auth/signup:

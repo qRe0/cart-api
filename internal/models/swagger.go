@@ -49,3 +49,11 @@ type LogInRequest struct {
 type LogInResponse struct {
 	Message string `json:"message" example:"User logged-in successfully!"`
 }
+
+type RefreshRequest struct {
+	RefreshToken string `json:"refreshToken" binding:"required" example:"...(numeric-letter string)"`
+}
+
+type RefreshResponse struct {
+	Message string `json:"message" example:"Token refreshed successfully!"`
+}
