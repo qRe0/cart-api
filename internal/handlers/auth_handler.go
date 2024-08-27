@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	pb "github.com/qRe0/cart-api/proto/gen/go"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/metadata"
 )
 
 type AuthHandler struct {
@@ -64,8 +65,48 @@ func (h *AuthHandler) SignUp(c *gin.Context) {
 	c.JSON(200, gin.H{"message": resp.Message})
 }
 
+// LogIn godoc
+// @Tags Public routes. Registration and Authentication
+// @Summary Log-In user
+// @Schemes
+// @Description This method allows user to log-in
+// @Accept json
+// @Produce json
+// @Param user body models.LogInRequest true "Input data for user log-in"
+// @Success 200 {object} models.LogInResponse "User logged-in successfully"
+// @Failure 400 {object} models.ErrorResponse "Invalid input data"
+// @Failure 401 {object} models.ErrorResponse "Unauthorized"
+// @Failure 500 {object} models.ErrorResponse "Internal server error"
+// @Router /auth/login [post]
 func (h *AuthHandler) LogIn(c *gin.Context) {
-	// #TODO: Implement LogIn
+	var user pb.LogInRequest
+	err := c.ShouldBindJSON(&user)
+	if err != nil {
+		c.JSON(400, gin.H{"error": err.Error()})
+		return
+	}
+
+	md := metadata.MD{}
+	ctx := metadata.NewOutgoingContext(c.Request.Context(), md)
+
+	var metadataHeader metadata.MD
+	resp, err := h.logInClient.LogIn(ctx, &user, grpc.Header(&metadataHeader))
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+
+	accessToken := metadataHeader.Get("Authorization")
+	refreshToken := metadataHeader.Get("Refresh-Token")
+	if len(accessToken) == 0 || len(refreshToken) == 0 {
+		c.JSON(401, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	c.Header("Authorization", accessToken[0])
+	c.Header("Refresh-Token", refreshToken[0])
+
+	c.JSON(200, gin.H{"message": resp.Message})
 }
 
 func (h *AuthHandler) LogOut(c *gin.Context) {
