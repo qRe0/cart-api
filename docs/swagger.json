@@ -18,6 +18,58 @@
     "host": "localhost:3000",
     "basePath": "/",
     "paths": {
+        "/auth/login": {
+            "post": {
+                "description": "This method allows user to log-in",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Public routes. Registration and Authentication"
+                ],
+                "summary": "Log-In user",
+                "parameters": [
+                    {
+                        "description": "Input data for user log-in",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.LogInRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User logged-in successfully",
+                        "schema": {
+                            "$ref": "#/definitions/models.LogInResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input data",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/auth/signup": {
             "post": {
                 "description": "This method allows user to create a new user",
@@ -341,6 +393,32 @@
                     "items": {
                         "$ref": "#/definitions/models.CartItem"
                     }
+                }
+            }
+        },
+        "models.LogInRequest": {
+            "type": "object",
+            "required": [
+                "password",
+                "phone"
+            ],
+            "properties": {
+                "password": {
+                    "type": "string",
+                    "example": "123456"
+                },
+                "phone": {
+                    "type": "string",
+                    "example": "+1111111111"
+                }
+            }
+        },
+        "models.LogInResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string",
+                    "example": "User logged-in successfully!"
                 }
             }
         },

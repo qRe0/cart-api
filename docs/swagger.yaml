@@ -49,6 +49,24 @@ definitions:
           $ref: '#/definitions/models.CartItem'
         type: array
     type: object
+  models.LogInRequest:
+    properties:
+      password:
+        example: "123456"
+        type: string
+      phone:
+        example: "+1111111111"
+        type: string
+    required:
+    - password
+    - phone
+    type: object
+  models.LogInResponse:
+    properties:
+      message:
+        example: User logged-in successfully!
+        type: string
+    type: object
   models.RemoveItemMessageResponse:
     properties:
       message:
@@ -98,6 +116,40 @@ info:
   title: Online shopping cart API
   version: "1.0"
 paths:
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: This method allows user to log-in
+      parameters:
+      - description: Input data for user log-in
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/models.LogInRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User logged-in successfully
+          schema:
+            $ref: '#/definitions/models.LogInResponse'
+        "400":
+          description: Invalid input data
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Log-In user
+      tags:
+      - Public routes. Registration and Authentication
   /auth/signup:
     post:
       consumes:

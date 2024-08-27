@@ -40,3 +40,12 @@ type SignUpRequest struct {
 type SignUpResponse struct {
 	Message string `json:"message" example:"User created successfully!"`
 }
+
+type LogInRequest struct {
+	Phone    string `json:"phone" binding:"required" example:"+1111111111"`
+	Password string `json:"password" binding:"required" example:"123456"`
+}
+
+type LogInResponse struct {
+	Message string `json:"message" example:"User logged-in successfully!"`
+}
