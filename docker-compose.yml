@@ -16,6 +16,9 @@ services:
       interval: 2s
       timeout: 2s
       retries: 3
+    networks:
+      - cart-network
+
 
   api:
     depends_on:
@@ -26,3 +29,9 @@ services:
     restart: unless-stopped
     ports:
       - ${API_PORT}:${API_PORT}
+    networks:
+      - cart-network
+
+networks:
+  cart-network:
+    external: true
