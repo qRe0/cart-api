@@ -87,6 +87,32 @@ definitions:
         example: Item removed from cart successfully
         type: string
     type: object
+  models.RevokeRequest:
+    properties:
+      email:
+        example: johndoe1@gmail.com
+        type: string
+      name:
+        example: John Doe
+        type: string
+      password:
+        example: "123456"
+        type: string
+      phone:
+        example: "+1111111111"
+        type: string
+    required:
+    - email
+    - name
+    - password
+    - phone
+    type: object
+  models.RevokeResponse:
+    properties:
+      message:
+        example: Tokens revoked!
+        type: string
+    type: object
   models.SignUpRequest:
     properties:
       email:
@@ -196,6 +222,36 @@ paths:
           schema:
             $ref: '#/definitions/models.ErrorResponse'
       summary: Refresh user tokens (Access and Refresh)
+      tags:
+      - Public routes. Registration and Authentication
+  /auth/revoke:
+    post:
+      consumes:
+      - application/json
+      description: This method allows user to revoke access and refresh tokens
+      parameters:
+      - description: Input data for token revoke
+        in: body
+        name: token
+        required: true
+        schema:
+          $ref: '#/definitions/models.RevokeRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Tokens revoked successfully
+          schema:
+            $ref: '#/definitions/models.RevokeResponse'
+        "400":
+          description: Invalid input data
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Revoke user tokens (Access and Refresh)
       tags:
       - Public routes. Registration and Authentication
   /auth/signup:

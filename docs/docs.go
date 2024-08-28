@@ -128,6 +128,52 @@ const docTemplate = `{
                 }
             }
         },
+        "/auth/revoke": {
+            "post": {
+                "description": "This method allows user to revoke access and refresh tokens",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Public routes. Registration and Authentication"
+                ],
+                "summary": "Revoke user tokens (Access and Refresh)",
+                "parameters": [
+                    {
+                        "description": "Input data for token revoke",
+                        "name": "token",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.RevokeRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Tokens revoked successfully",
+                        "schema": {
+                            "$ref": "#/definitions/models.RevokeResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input data",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/auth/signup": {
             "post": {
                 "description": "This method allows user to create a new user",
@@ -507,6 +553,42 @@ const docTemplate = `{
                 "message": {
                     "type": "string",
                     "example": "Item removed from cart successfully"
+                }
+            }
+        },
+        "models.RevokeRequest": {
+            "type": "object",
+            "required": [
+                "email",
+                "name",
+                "password",
+                "phone"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string",
+                    "example": "johndoe1@gmail.com"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "John Doe"
+                },
+                "password": {
+                    "type": "string",
+                    "example": "123456"
+                },
+                "phone": {
+                    "type": "string",
+                    "example": "+1111111111"
+                }
+            }
+        },
+        "models.RevokeResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string",
+                    "example": "Tokens revoked!"
                 }
             }
         },
