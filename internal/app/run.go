@@ -65,6 +65,7 @@ func Run() {
 	auth.POST("/login", handler.AuthHandler.LogIn)
 	auth.POST("/logout", handler.AuthHandler.LogOut)
 	auth.POST("/refresh", handler.AuthHandler.Refresh)
+	auth.POST("/revoke", handler.AuthHandler.RevokeTokens)
 
 	cart := router.Group("/cart")
 	cart.POST("/create", handler.CartHandler.CreateCart)

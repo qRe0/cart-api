@@ -14,6 +14,7 @@ type AuthHandler struct {
 	logInClient   pb.LogInClient
 	logOutClient  pb.LogOutClient
 	refreshClient pb.RefreshClient
+	revokeClient  pb.RevokeClient
 }
 
 func NewAuthHandler(address string) *AuthHandler {
@@ -27,12 +28,14 @@ func NewAuthHandler(address string) *AuthHandler {
 	logInClient := pb.NewLogInClient(conn)
 	logOutClient := pb.NewLogOutClient(conn)
 	refreshClient := pb.NewRefreshClient(conn)
+	revokeClient := pb.NewRevokeClient(conn)
 
 	return &AuthHandler{
 		signUpClient:  signUpClient,
 		logInClient:   logInClient,
 		logOutClient:  logOutClient,
 		refreshClient: refreshClient,
+		revokeClient:  revokeClient,
 	}
 }
 
@@ -170,6 +173,35 @@ func (h *AuthHandler) Refresh(c *gin.Context) {
 
 	c.Header("Authorization", newAccessToken[0])
 	c.Header("Refresh-Token", newRefreshToken[0])
+
+	c.JSON(200, gin.H{"message": resp.Message})
+}
+
+// RevokeTokens godoc
+// @Tags Public routes. Registration and Authentication
+// @Summary Revoke user tokens (Access and Refresh)
+// @Schemes
+// @Description This method allows user to revoke access and refresh tokens
+// @Accept json
+// @Produce json
+// @Param token body models.RevokeRequest true "Input data for token revoke"
+// @Success 200 {object} models.RevokeResponse "Tokens revoked successfully"
+// @Failure 400 {object} models.ErrorResponse "Invalid input data"
+// @Failure 500 {object} models.ErrorResponse "Internal server error"
+// @Router /auth/revoke [post]
+func (h *AuthHandler) RevokeTokens(c *gin.Context) {
+	var user pb.RevokeRequest
+	err := c.ShouldBindJSON(&user)
+	if err != nil {
+		c.JSON(400, gin.H{"error": err.Error()})
+		return
+	}
+
+	resp, err := h.revokeClient.Revoke(c.Request.Context(), &user)
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
 
 	c.JSON(200, gin.H{"message": resp.Message})
 }
