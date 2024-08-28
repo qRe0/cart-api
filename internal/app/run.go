@@ -50,8 +50,7 @@ func Run() {
 		}
 	}(db)
 
-	// Replace strings with env configs
-	address := fmt.Sprintf(":%s", "50051")
+	address := fmt.Sprintf("%s:%s", cfg.GRPC.Host, cfg.GRPC.Port)
 	cartRepository := repository.NewCartRepository(db)
 	cartService := service.NewCartService(cartRepository)
 	handler := handlers.NewHandler(cartService, address)

@@ -21,9 +21,15 @@ type DBConfig struct {
 	Port     string
 }
 
+type GRPC struct {
+	Host string
+	Port string
+}
+
 type Config struct {
-	API APIConfig
-	DB  DBConfig
+	API  APIConfig
+	DB   DBConfig
+	GRPC GRPC
 }
 
 func LoadEnv() (*Config, error) {
@@ -33,7 +39,7 @@ func LoadEnv() (*Config, error) {
 	}
 
 	requiredEnvs := []string{
-		"DB_HOST", "DB_USER", "DB_PASSWORD", "DB_NAME", "DB_PORT", "API_PORT", "SHUTDOWN_TIMEOUT",
+		"DB_HOST", "DB_USER", "DB_PASSWORD", "DB_NAME", "DB_PORT", "API_PORT", "SHUTDOWN_TIMEOUT", "GRPC_PORT", "GRPC_HOST",
 	}
 
 	for _, env := range requiredEnvs {
@@ -53,6 +59,10 @@ func LoadEnv() (*Config, error) {
 			Password: os.Getenv("DB_PASSWORD"),
 			DBName:   os.Getenv("DB_NAME"),
 			Port:     os.Getenv("DB_PORT"),
+		},
+		GRPC: GRPC{
+			Host: os.Getenv("GRPC_HOST"),
+			Port: os.Getenv("GRPC_PORT"),
 		},
 	}
 
