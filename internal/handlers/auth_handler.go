@@ -151,13 +151,10 @@ func (h *AuthHandler) Refresh(c *gin.Context) {
 		return
 	}
 
-	log.Println(token.RefreshToken)
-
 	md := metadata.MD{}
 	ctx := metadata.NewOutgoingContext(c.Request.Context(), md)
 
 	var metadataHeader metadata.MD
-	log.Println(token.RefreshToken)
 	resp, err := h.refreshClient.Refresh(ctx, &token, grpc.Header(&metadataHeader))
 	if err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
