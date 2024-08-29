@@ -7,7 +7,6 @@ import (
 
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
-	"github.com/qRe0/cart-api/configs"
 	errs "github.com/qRe0/cart-api/internal/errors"
 	"github.com/qRe0/cart-api/internal/models"
 )
@@ -37,8 +36,8 @@ func NewCartRepository(db *sqlx.DB) *CartRepository {
 	}
 }
 
-func Init(cfg configs.DBConfig) (*sqlx.DB, error) {
-	connStr := fmt.Sprintf(connStrTmpl, cfg.User, cfg.Password, cfg.DBName, cfg.Host)
+func Init(cfg models.Config) (*sqlx.DB, error) {
+	connStr := fmt.Sprintf(connStrTmpl, cfg.DBUser, cfg.DBPassword, cfg.DBName, cfg.DBHost)
 
 	db, err := sqlx.Open("postgres", connStr)
 	if err != nil {

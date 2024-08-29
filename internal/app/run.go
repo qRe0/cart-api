@@ -9,14 +9,14 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
-	"time"
 
+	"github.com/caarlos0/env"
 	"github.com/gin-gonic/gin"
 	"github.com/jmoiron/sqlx"
-	"github.com/qRe0/cart-api/configs"
 	errs "github.com/qRe0/cart-api/internal/errors"
 	"github.com/qRe0/cart-api/internal/handlers"
 	"github.com/qRe0/cart-api/internal/migrations"
+	"github.com/qRe0/cart-api/internal/models"
 	"github.com/qRe0/cart-api/internal/repository"
 	"github.com/qRe0/cart-api/internal/service"
 	swaggerFiles "github.com/swaggo/files"
@@ -24,12 +24,10 @@ import (
 )
 
 func Run() {
-	cfg, err := configs.LoadEnv()
-	if err != nil {
-		log.Fatalln(err)
-	}
+	var cfg models.Config
+	err := env.Parse(&cfg)
 
-	db, err := repository.Init(cfg.DB)
+	db, err := repository.Init(cfg)
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -63,7 +61,7 @@ func Run() {
 	cart.POST("/:cart_id/add", handler.ItemHandler.AddItemToCart)
 	cart.DELETE("/:cart_id/remove/:item_id", handler.ItemHandler.RemoveItemFromCart)
 
-	port := fmt.Sprintf(":%s", cfg.API.Port)
+	port := fmt.Sprintf(":%s", cfg.APIPort)
 	server := &http.Server{
 		Addr:    port,
 		Handler: router,
@@ -84,11 +82,7 @@ func Run() {
 
 	log.Println("Server is shutting down...")
 
-	timeout, err := time.ParseDuration(cfg.API.ShutdownTimeout)
-	if err != nil {
-		log.Fatalf("Failed to parse shutdown timeout: %v", err)
-	}
-
+	timeout := cfg.ShutdownTimeout
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 
