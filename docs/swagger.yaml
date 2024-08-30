@@ -320,6 +320,8 @@ paths:
           description: Internal server error
           schema:
             $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
       summary: Add item to shopping cart
       tags:
       - CartItem Operations. This is a simple API for online shopping cart
@@ -353,6 +355,8 @@ paths:
           description: Internal server error
           schema:
             $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
       summary: Get shopping cart
       tags:
       - Cart Operations. This is a simple API for online shopping cart
@@ -391,6 +395,8 @@ paths:
           description: Internal server error
           schema:
             $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
       summary: Remove item from shopping cart
       tags:
       - CartItem Operations. This is a simple API for online shopping cart
