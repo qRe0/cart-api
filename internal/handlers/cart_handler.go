@@ -54,6 +54,7 @@ func (h *CartHandler) CreateCart(c *gin.Context) {
 // @Failure 401 {object} models.ErrorResponse "Empty claims"
 // @Failure 500 {object} models.ErrorResponse "Internal server error"
 // @Router /cart/{cart_id}/get [get]
+// @Security ApiKeyAuth
 func (h *CartHandler) GetCart(c *gin.Context) {
 	ctx := c.Request.Context()
 	cartIDStr := c.Param("cart_id")

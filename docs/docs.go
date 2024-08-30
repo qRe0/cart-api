@@ -262,6 +262,11 @@ const docTemplate = `{
         },
         "/cart/{cart_id}/add": {
             "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "This method allows user to add item to cart",
                 "consumes": [
                     "application/json"
@@ -321,6 +326,11 @@ const docTemplate = `{
         },
         "/cart/{cart_id}/get": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "This method allows user to get cart by ID",
                 "consumes": [
                     "application/json"
@@ -371,6 +381,11 @@ const docTemplate = `{
         },
         "/cart/{cart_id}/remove/{item_id}": {
             "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "This method allows user to remove item from cart",
                 "consumes": [
                     "application/json"
