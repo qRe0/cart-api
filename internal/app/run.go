@@ -16,6 +16,7 @@ import (
 	"github.com/qRe0/cart-api/configs"
 	errs "github.com/qRe0/cart-api/internal/errors"
 	"github.com/qRe0/cart-api/internal/handlers"
+	"github.com/qRe0/cart-api/internal/middleware"
 	"github.com/qRe0/cart-api/internal/migrations"
 	"github.com/qRe0/cart-api/internal/repository"
 	"github.com/qRe0/cart-api/internal/service"
@@ -67,10 +68,13 @@ func Run() {
 	auth.POST("/revoke", handler.AuthHandler.RevokeTokens)
 
 	cart := router.Group("/cart")
-	cart.POST("/create", handler.CartHandler.CreateCart)
-	cart.GET("/:cart_id/get", handler.CartHandler.GetCart)
-	cart.POST("/:cart_id/add", handler.ItemHandler.AddItemToCart)
-	cart.DELETE("/:cart_id/remove/:item_id", handler.ItemHandler.RemoveItemFromCart)
+	cart.Use(middleware.AuthMiddleware(handler.AuthHandler.MiddlewareClient))
+	{
+		cart.POST("/create", handler.CartHandler.CreateCart)
+		cart.GET("/:cart_id/get", handler.CartHandler.GetCart)
+		cart.POST("/:cart_id/add", handler.ItemHandler.AddItemToCart)
+		cart.DELETE("/:cart_id/remove/:item_id", handler.ItemHandler.RemoveItemFromCart)
+	}
 
 	port := fmt.Sprintf(":%s", cfg.API.Port)
 	server := &http.Server{

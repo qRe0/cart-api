@@ -34,6 +34,7 @@ func NewItemHandler(cs service.CartServiceInterface) *ItemHandler {
 // @Failure 401 {object} models.ErrorResponse "Empty claims"
 // @Failure 500 {object} models.ErrorResponse "Internal server error"
 // @Router /cart/{cart_id}/add [post]
+// @Security ApiKeyAuth
 func (h *ItemHandler) AddItemToCart(c *gin.Context) {
 	ctx := c.Request.Context()
 
@@ -68,6 +69,7 @@ func (h *ItemHandler) AddItemToCart(c *gin.Context) {
 // @Failure 401 {object} models.ErrorResponse "Empty claims"
 // @Failure 500 {object} models.ErrorResponse "Internal server error"
 // @Router /cart/{cart_id}/remove/{item_id} [delete]
+// @Security ApiKeyAuth
 func (h *ItemHandler) RemoveItemFromCart(c *gin.Context) {
 	ctx := c.Request.Context()
 

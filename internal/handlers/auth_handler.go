@@ -10,11 +10,12 @@ import (
 )
 
 type AuthHandler struct {
-	signUpClient  pb.SignUpClient
-	logInClient   pb.LogInClient
-	logOutClient  pb.LogOutClient
-	refreshClient pb.RefreshClient
-	revokeClient  pb.RevokeClient
+	signUpClient     pb.SignUpClient
+	logInClient      pb.LogInClient
+	logOutClient     pb.LogOutClient
+	refreshClient    pb.RefreshClient
+	revokeClient     pb.RevokeClient
+	MiddlewareClient pb.AuthMiddlewareClient
 }
 
 func NewAuthHandler(address string) *AuthHandler {
@@ -29,13 +30,15 @@ func NewAuthHandler(address string) *AuthHandler {
 	logOutClient := pb.NewLogOutClient(conn)
 	refreshClient := pb.NewRefreshClient(conn)
 	revokeClient := pb.NewRevokeClient(conn)
+	middlewareClient := pb.NewAuthMiddlewareClient(conn)
 
 	return &AuthHandler{
-		signUpClient:  signUpClient,
-		logInClient:   logInClient,
-		logOutClient:  logOutClient,
-		refreshClient: refreshClient,
-		revokeClient:  revokeClient,
+		signUpClient:     signUpClient,
+		logInClient:      logInClient,
+		logOutClient:     logOutClient,
+		refreshClient:    refreshClient,
+		revokeClient:     revokeClient,
+		MiddlewareClient: middlewareClient,
 	}
 }
 
