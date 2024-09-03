@@ -76,6 +76,46 @@ const docTemplate = `{
                 }
             }
         },
+        "/auth/logout": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "This method allows user to log-out",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Public routes. Registration and Authentication"
+                ],
+                "summary": "Log-Out user",
+                "responses": {
+                    "200": {
+                        "description": "User logged-out successfully",
+                        "schema": {
+                            "$ref": "#/definitions/models.LogOutResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/auth/refresh": {
             "post": {
                 "description": "This method allows user to release new access and refresh tokens",
@@ -538,6 +578,15 @@ const docTemplate = `{
                 "message": {
                     "type": "string",
                     "example": "User logged-in successfully!"
+                }
+            }
+        },
+        "models.LogOutResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string",
+                    "example": "Logged out successfully!"
                 }
             }
         },

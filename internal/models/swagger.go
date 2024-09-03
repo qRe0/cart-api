@@ -68,3 +68,7 @@ type RevokeRequest struct {
 type RevokeResponse struct {
 	Message string `json:"message" example:"Tokens revoked!"`
 }
+
+type LogOutResponse struct {
+	Message string `json:"message" example:"Logged out successfully!"`
+}

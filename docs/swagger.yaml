@@ -67,6 +67,12 @@ definitions:
         example: User logged-in successfully!
         type: string
     type: object
+  models.LogOutResponse:
+    properties:
+      message:
+        example: Logged out successfully!
+        type: string
+    type: object
   models.RefreshRequest:
     properties:
       refreshToken:
@@ -188,6 +194,31 @@ paths:
           schema:
             $ref: '#/definitions/models.ErrorResponse'
       summary: Log-In user
+      tags:
+      - Public routes. Registration and Authentication
+  /auth/logout:
+    post:
+      consumes:
+      - application/json
+      description: This method allows user to log-out
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User logged-out successfully
+          schema:
+            $ref: '#/definitions/models.LogOutResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Log-Out user
       tags:
       - Public routes. Registration and Authentication
   /auth/refresh:
