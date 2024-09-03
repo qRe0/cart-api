@@ -1,28 +1,23 @@
 version: '3.8'
 
 services:
-  psql:
-    image: postgres:latest
+  mongo:
+    image: mongo:latest
     container_name: cart-db
     restart: unless-stopped
-    environment:
-      - POSTGRES_USER=${DB_USER}
-      - POSTGRES_PASSWORD=${DB_PASSWORD}
-      - POSTGRES_DB=${DB_NAME}
     ports:
-      - 5433:${DB_PORT}
+      - ${DB_PORT}:${DB_PORT}
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}" ]
-      interval: 2s
-      timeout: 2s
+      test: [ "CMD", "mongo", "--eval", "db.adminCommand('ping')" ]
+      interval: 10s
+      timeout: 5s
       retries: 3
     networks:
       - cart-network
 
-
   api:
     depends_on:
-      psql:
+      mongo:
         condition: service_healthy
     build: .
     container_name: cart-api
