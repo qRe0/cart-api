@@ -1,29 +1,28 @@
 package configs
 
 import (
-	"fmt"
-	"os"
-
+	"github.com/caarlos0/env"
 	"github.com/joho/godotenv"
+	"github.com/pkg/errors"
 	errs "github.com/qRe0/cart-api/internal/errors"
 )
 
 type APIConfig struct {
-	Port            string
-	ShutdownTimeout string
+	Port            string `env:"API_PORT"`
+	ShutdownTimeout string `env:"SHUTDOWN_TIMEOUT"`
 }
 
 type DBConfig struct {
-	Host     string
-	User     string
-	Password string
-	DBName   string
-	Port     string
+	Host     string `env:"DB_HOST"`
+	User     string `env:"DB_USER"`
+	Password string `env:"DB_PASSWORD"`
+	DBName   string `env:"DB_NAME"`
+	Port     string `env:"DB_PORT"`
 }
 
 type GRPC struct {
-	Host string
-	Port string
+	Host string `env:"GRPC_HOST"`
+	Port string `env:"GRPC_PORT"`
 }
 
 type Config struct {
@@ -38,33 +37,29 @@ func LoadEnv() (*Config, error) {
 		return nil, errs.ErrLoadEnvVars
 	}
 
-	requiredEnvs := []string{
-		"DB_HOST", "DB_USER", "DB_PASSWORD", "DB_NAME", "DB_PORT", "API_PORT", "SHUTDOWN_TIMEOUT", "GRPC_PORT", "GRPC_HOST",
+	var apiCfg APIConfig
+	err = env.Parse(&apiCfg)
+	if err != nil {
+		return nil, errors.Wrap(errs.ErrLoadEnvVars, "API")
 	}
 
-	for _, env := range requiredEnvs {
-		if os.Getenv(env) == "" {
-			return nil, fmt.Errorf("environment variable `%s` is not set or is empty", env)
-		}
+	var dbCfg DBConfig
+	err = env.Parse(&dbCfg)
+	if err != nil {
+		return nil, errors.Wrap(errs.ErrLoadEnvVars, "DB")
 	}
 
-	config := Config{
-		API: APIConfig{
-			Port:            os.Getenv("API_PORT"),
-			ShutdownTimeout: os.Getenv("SHUTDOWN_TIMEOUT"),
-		},
-		DB: DBConfig{
-			Host:     os.Getenv("DB_HOST"),
-			User:     os.Getenv("DB_USER"),
-			Password: os.Getenv("DB_PASSWORD"),
-			DBName:   os.Getenv("DB_NAME"),
-			Port:     os.Getenv("DB_PORT"),
-		},
-		GRPC: GRPC{
-			Host: os.Getenv("GRPC_HOST"),
-			Port: os.Getenv("GRPC_PORT"),
-		},
+	var grpcCfg GRPC
+	err = env.Parse(&grpcCfg)
+	if err != nil {
+		return nil, errors.Wrap(errs.ErrLoadEnvVars, "GRPC")
 	}
 
-	return &config, nil
+	cfg := &Config{
+		API:  apiCfg,
+		DB:   dbCfg,
+		GRPC: grpcCfg,
+	}
+
+	return cfg, nil
 }
