@@ -129,8 +129,35 @@ func (h *AuthHandler) LogIn(c *gin.Context) {
 	c.JSON(200, gin.H{"message": resp.Message})
 }
 
+// LogOut godoc
+// @Tags Public routes. Registration and Authentication
+// @Summary Log-Out user
+// @Schemes
+// @Description This method allows user to log-out
+// @Accept json
+// @Produce json
+// @Success 200 {object} models.LogOutResponse "User logged-out successfully"
+// @Failure 401 {object} models.ErrorResponse "Unauthorized"
+// @Failure 500 {object} models.ErrorResponse "Internal server error"
+// @Router /auth/logout [post]
+// @Security ApiKeyAuth
 func (h *AuthHandler) LogOut(c *gin.Context) {
-	// #TODO: Implement LogOut
+	token := c.GetHeader("Authorization")
+	if token == "" {
+		c.JSON(401, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	md := metadata.Pairs("Authorization", token)
+	ctx := metadata.NewOutgoingContext(c.Request.Context(), md)
+
+	resp, err := h.logOutClient.LogOut(ctx, &pb.LogOutRequest{})
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(200, gin.H{"message": resp.Message})
 }
 
 // Refresh godoc

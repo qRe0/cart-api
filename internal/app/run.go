@@ -63,9 +63,12 @@ func Run() {
 	auth := router.Group("/auth")
 	auth.POST("/signup", handler.AuthHandler.SignUp)
 	auth.POST("/login", handler.AuthHandler.LogIn)
-	auth.POST("/logout", handler.AuthHandler.LogOut)
 	auth.POST("/refresh", handler.AuthHandler.Refresh)
 	auth.POST("/revoke", handler.AuthHandler.RevokeTokens)
+	auth.Use(middleware.AuthMiddleware(handler.AuthHandler.MiddlewareClient))
+	{
+		auth.POST("/logout", handler.AuthHandler.LogOut)
+	}
 
 	cart := router.Group("/cart")
 	cart.Use(middleware.AuthMiddleware(handler.AuthHandler.MiddlewareClient))
