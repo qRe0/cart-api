@@ -49,10 +49,100 @@ definitions:
           $ref: '#/definitions/models.CartItem'
         type: array
     type: object
+  models.LogInRequest:
+    properties:
+      password:
+        example: "123456"
+        type: string
+      phone:
+        example: "+1111111111"
+        type: string
+    required:
+    - password
+    - phone
+    type: object
+  models.LogInResponse:
+    properties:
+      message:
+        example: User logged-in successfully!
+        type: string
+    type: object
+  models.LogOutResponse:
+    properties:
+      message:
+        example: Logged out successfully!
+        type: string
+    type: object
+  models.RefreshRequest:
+    properties:
+      refreshToken:
+        example: '...(numeric-letter string)'
+        type: string
+    required:
+    - refreshToken
+    type: object
+  models.RefreshResponse:
+    properties:
+      message:
+        example: Token refreshed successfully!
+        type: string
+    type: object
   models.RemoveItemMessageResponse:
     properties:
       message:
         example: Item removed from cart successfully
+        type: string
+    type: object
+  models.RevokeRequest:
+    properties:
+      email:
+        example: johndoe1@gmail.com
+        type: string
+      name:
+        example: John Doe
+        type: string
+      password:
+        example: "123456"
+        type: string
+      phone:
+        example: "+1111111111"
+        type: string
+    required:
+    - email
+    - name
+    - password
+    - phone
+    type: object
+  models.RevokeResponse:
+    properties:
+      message:
+        example: Tokens revoked!
+        type: string
+    type: object
+  models.SignUpRequest:
+    properties:
+      email:
+        example: johndoe1@gmail.com
+        type: string
+      name:
+        example: John Doe
+        type: string
+      password:
+        example: "123456"
+        type: string
+      phone:
+        example: "+1111111111"
+        type: string
+    required:
+    - email
+    - name
+    - password
+    - phone
+    type: object
+  models.SignUpResponse:
+    properties:
+      message:
+        example: User created successfully!
         type: string
     type: object
 externalDocs:
@@ -72,6 +162,159 @@ info:
   title: Online shopping cart API
   version: "1.0"
 paths:
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: This method allows user to log-in
+      parameters:
+      - description: Input data for user log-in
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/models.LogInRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User logged-in successfully
+          schema:
+            $ref: '#/definitions/models.LogInResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "422":
+          description: Invalid input data
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Log-In user
+      tags:
+      - Public routes. Registration and Authentication
+  /auth/logout:
+    post:
+      consumes:
+      - application/json
+      description: This method allows user to log-out
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User logged-out successfully
+          schema:
+            $ref: '#/definitions/models.LogOutResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Log-Out user
+      tags:
+      - Public routes. Registration and Authentication
+  /auth/refresh:
+    post:
+      consumes:
+      - application/json
+      description: This method allows user to release new access and refresh tokens
+      parameters:
+      - description: Input data for token refresh
+        in: body
+        name: token
+        required: true
+        schema:
+          $ref: '#/definitions/models.RefreshRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Tokens refreshed successfully
+          schema:
+            $ref: '#/definitions/models.RefreshResponse'
+        "422":
+          description: Invalid input data
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Refresh user tokens (Access and Refresh)
+      tags:
+      - Public routes. Registration and Authentication
+  /auth/revoke:
+    post:
+      consumes:
+      - application/json
+      description: This method allows user to revoke access and refresh tokens
+      parameters:
+      - description: Input data for token revoke
+        in: body
+        name: token
+        required: true
+        schema:
+          $ref: '#/definitions/models.RevokeRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Tokens revoked successfully
+          schema:
+            $ref: '#/definitions/models.RevokeResponse'
+        "422":
+          description: Invalid input data
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Revoke user tokens (Access and Refresh)
+      tags:
+      - Public routes. Registration and Authentication
+  /auth/signup:
+    post:
+      consumes:
+      - application/json
+      description: This method allows user to create a new user
+      parameters:
+      - description: Input data for user registration
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/models.SignUpRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User created successfully
+          schema:
+            $ref: '#/definitions/models.SignUpResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "422":
+          description: Invalid input data
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Sign-Up new user and authorize him
+      tags:
+      - Public routes. Registration and Authentication
   /cart/{cart_id}/add:
     post:
       consumes:
@@ -108,6 +351,8 @@ paths:
           description: Internal server error
           schema:
             $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
       summary: Add item to shopping cart
       tags:
       - CartItem Operations. This is a simple API for online shopping cart
@@ -141,6 +386,8 @@ paths:
           description: Internal server error
           schema:
             $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
       summary: Get shopping cart
       tags:
       - Cart Operations. This is a simple API for online shopping cart
@@ -179,6 +426,8 @@ paths:
           description: Internal server error
           schema:
             $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
       summary: Remove item from shopping cart
       tags:
       - CartItem Operations. This is a simple API for online shopping cart

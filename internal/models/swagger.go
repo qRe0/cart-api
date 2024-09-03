@@ -29,3 +29,46 @@ type AddItemResponse struct {
 type RemoveItemMessageResponse struct {
 	Message string `json:"message" example:"Item removed from cart successfully"`
 }
+
+type SignUpRequest struct {
+	Name     string `json:"name" binding:"required" example:"John Doe"`
+	Phone    string `json:"phone" binding:"required" example:"+1111111111"`
+	Email    string `json:"email" binding:"required" example:"johndoe1@gmail.com"`
+	Password string `json:"password" binding:"required" example:"123456"`
+}
+
+type SignUpResponse struct {
+	Message string `json:"message" example:"User created successfully!"`
+}
+
+type LogInRequest struct {
+	Phone    string `json:"phone" binding:"required" example:"+1111111111"`
+	Password string `json:"password" binding:"required" example:"123456"`
+}
+
+type LogInResponse struct {
+	Message string `json:"message" example:"User logged-in successfully!"`
+}
+
+type RefreshRequest struct {
+	RefreshToken string `json:"refreshToken" binding:"required" example:"...(numeric-letter string)"`
+}
+
+type RefreshResponse struct {
+	Message string `json:"message" example:"Token refreshed successfully!"`
+}
+
+type RevokeRequest struct {
+	Name     string `json:"name" binding:"required" example:"John Doe"`
+	Phone    string `json:"phone" binding:"required" example:"+1111111111"`
+	Email    string `json:"email" binding:"required" example:"johndoe1@gmail.com"`
+	Password string `json:"password" binding:"required" example:"123456"`
+}
+
+type RevokeResponse struct {
+	Message string `json:"message" example:"Tokens revoked!"`
+}
+
+type LogOutResponse struct {
+	Message string `json:"message" example:"Logged out successfully!"`
+}

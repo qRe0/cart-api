@@ -16,6 +16,7 @@ import (
 	"github.com/qRe0/cart-api/configs"
 	errs "github.com/qRe0/cart-api/internal/errors"
 	"github.com/qRe0/cart-api/internal/handlers"
+	"github.com/qRe0/cart-api/internal/middleware"
 	"github.com/qRe0/cart-api/internal/migrations"
 	"github.com/qRe0/cart-api/internal/repository"
 	"github.com/qRe0/cart-api/internal/service"
@@ -50,18 +51,33 @@ func Run() {
 		}
 	}(db)
 
+	address := fmt.Sprintf("%s:%s", cfg.GRPC.Host, cfg.GRPC.Port)
 	cartRepository := repository.NewCartRepository(db)
 	cartService := service.NewCartService(cartRepository)
-	handler := handlers.NewHandler(cartService)
+	handler := handlers.NewHandler(cartService, address)
 
 	router := gin.Default()
+
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
+	auth := router.Group("/auth")
+	auth.POST("/signup", handler.AuthHandler.SignUp)
+	auth.POST("/login", handler.AuthHandler.LogIn)
+	auth.POST("/refresh", handler.AuthHandler.Refresh)
+	auth.POST("/revoke", handler.AuthHandler.RevokeTokens)
+	auth.Use(middleware.AuthMiddleware(handler.AuthHandler.MiddlewareClient))
+	{
+		auth.POST("/logout", handler.AuthHandler.LogOut)
+	}
+
 	cart := router.Group("/cart")
-	cart.POST("/create", handler.CartHandler.CreateCart)
-	cart.GET("/:cart_id/get", handler.CartHandler.GetCart)
-	cart.POST("/:cart_id/add", handler.ItemHandler.AddItemToCart)
-	cart.DELETE("/:cart_id/remove/:item_id", handler.ItemHandler.RemoveItemFromCart)
+	cart.Use(middleware.AuthMiddleware(handler.AuthHandler.MiddlewareClient))
+	{
+		cart.POST("/create", handler.CartHandler.CreateCart)
+		cart.GET("/:cart_id/get", handler.CartHandler.GetCart)
+		cart.POST("/:cart_id/add", handler.ItemHandler.AddItemToCart)
+		cart.DELETE("/:cart_id/remove/:item_id", handler.ItemHandler.RemoveItemFromCart)
+	}
 
 	port := fmt.Sprintf(":%s", cfg.API.Port)
 	server := &http.Server{
