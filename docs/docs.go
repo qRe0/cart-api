@@ -55,14 +55,14 @@ const docTemplate = `{
                             "$ref": "#/definitions/models.LogInResponse"
                         }
                     },
-                    "400": {
-                        "description": "Invalid input data",
+                    "401": {
+                        "description": "Unauthorized",
                         "schema": {
                             "$ref": "#/definitions/models.ErrorResponse"
                         }
                     },
-                    "401": {
-                        "description": "Unauthorized",
+                    "422": {
+                        "description": "Invalid input data",
                         "schema": {
                             "$ref": "#/definitions/models.ErrorResponse"
                         }
@@ -147,14 +147,8 @@ const docTemplate = `{
                             "$ref": "#/definitions/models.RefreshResponse"
                         }
                     },
-                    "400": {
+                    "422": {
                         "description": "Invalid input data",
-                        "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
                         "schema": {
                             "$ref": "#/definitions/models.ErrorResponse"
                         }
@@ -199,7 +193,7 @@ const docTemplate = `{
                             "$ref": "#/definitions/models.RevokeResponse"
                         }
                     },
-                    "400": {
+                    "422": {
                         "description": "Invalid input data",
                         "schema": {
                             "$ref": "#/definitions/models.ErrorResponse"
@@ -245,7 +239,13 @@ const docTemplate = `{
                             "$ref": "#/definitions/models.SignUpResponse"
                         }
                     },
-                    "400": {
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "422": {
                         "description": "Invalid input data",
                         "schema": {
                             "$ref": "#/definitions/models.ErrorResponse"

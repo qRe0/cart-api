@@ -181,12 +181,12 @@ paths:
           description: User logged-in successfully
           schema:
             $ref: '#/definitions/models.LogInResponse'
-        "400":
-          description: Invalid input data
-          schema:
-            $ref: '#/definitions/models.ErrorResponse'
         "401":
           description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "422":
+          description: Invalid input data
           schema:
             $ref: '#/definitions/models.ErrorResponse'
         "500":
@@ -240,12 +240,8 @@ paths:
           description: Tokens refreshed successfully
           schema:
             $ref: '#/definitions/models.RefreshResponse'
-        "400":
+        "422":
           description: Invalid input data
-          schema:
-            $ref: '#/definitions/models.ErrorResponse'
-        "401":
-          description: Unauthorized
           schema:
             $ref: '#/definitions/models.ErrorResponse'
         "500":
@@ -274,7 +270,7 @@ paths:
           description: Tokens revoked successfully
           schema:
             $ref: '#/definitions/models.RevokeResponse'
-        "400":
+        "422":
           description: Invalid input data
           schema:
             $ref: '#/definitions/models.ErrorResponse'
@@ -304,7 +300,11 @@ paths:
           description: User created successfully
           schema:
             $ref: '#/definitions/models.SignUpResponse'
-        "400":
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "422":
           description: Invalid input data
           schema:
             $ref: '#/definitions/models.ErrorResponse'
