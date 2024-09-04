@@ -14,6 +14,7 @@ WORKDIR /root/
 
 COPY --from=builder /app/cart-api .
 COPY --from=builder /app/.env .
+COPY --from=builder /app/internal/migrations ./internal/migrations
 
 EXPOSE ${API_PORT}
 
